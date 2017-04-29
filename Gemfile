@@ -6,31 +6,19 @@ git_source(:github) do |repo_name|
 end
 
 
-# Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 5.1.0'
-# Use postgresql as the database for Active Record
-gem 'pg', '~> 0.18'
-# Use Puma as the app server
-gem 'puma', '~> 3.7'
-# Use SCSS for stylesheets
-gem 'sass-rails', '~> 5.0'
-# Use Uglifier as compressor for JavaScript assets
-gem 'uglifier', '>= 1.3.0'
-# Transpile app-like JavaScript. Read more: https://github.com/rails/webpacker
-gem 'webpacker'
-# See https://github.com/rails/execjs#readme for more supported runtimes
-# gem 'therubyracer', platforms: :ruby
+gem 'rails', '~> 5.1.0'  # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
+gem 'pg', '~> 0.18'  # Use postgresql as the database for Active Record
+gem 'puma', '~> 3.7'  # Use Puma as the app server
+gem 'sass-rails', '~> 5.0'  # Use SCSS for stylesheets
+gem 'uglifier', '>= 1.3.0'  # Use Uglifier as compressor for JavaScript assets
+gem 'webpacker'  # Transpile app-like JavaScript. Read more: https://github.com/rails/webpacker
+gem 'coffee-rails', '~> 4.2'  # Use CoffeeScript for .coffee assets and views
+gem 'turbolinks', '~> 5'  # Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
+gem 'jbuilder', '~> 2.5'  # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
+gem 'redis', '~> 3.0'  # Use Redis adapter to run Action Cable in production
 
-# Use CoffeeScript for .coffee assets and views
-gem 'coffee-rails', '~> 4.2'
-# Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
-gem 'turbolinks', '~> 5'
-# Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
-gem 'jbuilder', '~> 2.5'
-# Use Redis adapter to run Action Cable in production
-# gem 'redis', '~> 3.0'
-# Use ActiveModel has_secure_password
-# gem 'bcrypt', '~> 3.1.7'
+# Windows does not include zoneinfo files, so bundle the tzinfo-data gem
+gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
@@ -50,7 +38,14 @@ group :development do
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
+
+  gem 'pry-rails', '~> 0.3' # Use Pry REPL as Rails console
 end
 
-# Windows does not include zoneinfo files, so bundle the tzinfo-data gem
-gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
+
+gem 'argon2' # Password hashing with Argon2 - OWASP recommended algorithm and the Password Hashing Competition winner https://github.com/P-H-C/phc-winner-argon2
+gem 'cancancan', github: 'TeWu/cancancan', branch: 'develop' # For authorization. Using develop branch for as much Rails 5 support as possible.
+
+gem 'stringex' # For pretty url id segments
+
+gem 'autoprefixer-rails' # Adds vendor prefixes to CSS rules, using the Asset Pipeline
