@@ -8,6 +8,7 @@
       <th>Username</th>
       <th>Passhash</th>
       <th>Roles bitmask</th>
+      <th>Roles</th>
       <th>Is admin</th>
       <th>Display name</th>
       <th>Email</th>
@@ -23,7 +24,8 @@
       <tr>
         <td><%= user.username %></td>
         <td><%= user.passhash %></td>
-        <td><%= user.roles_bitmask %></td>
+        <td><%= user.roles_bitmask %> (<%= user.roles_bitmask.to_s(2) %>)</td>
+        <td><%= user.roles_string %></td>
         <td><%= user.is_admin %></td>
         <td><%= user.display_name %></td>
         <td><%= user.email %></td>
