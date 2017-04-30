@@ -2,5 +2,6 @@
   "presets": [
     ["env", { "modules": false } ],
     "react"
-  ]
+  ],
+  "plugins": ["react-html-attrs", "transform-decorators-legacy", "transform-class-properties"]
 }
