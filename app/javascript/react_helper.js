@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 
 
 const components = requireAndRegister(
+  'application/main_app',
   'test/test'
 )
 
