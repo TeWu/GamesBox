@@ -10,10 +10,10 @@ class User {
   @observable invitedBy
   @observable createdAt
   @observable updatedAt
-  @observable url
 
-  constructor({ id, username, roles, is_admin, display_name, email, invite_key, invited_by, created_at, updated_at, url }) {
+  constructor({ id, url_segment, username, roles, is_admin, display_name, email, invite_key, invited_by, created_at, updated_at }) {
     this.id = id
+    this.urlSegment = url_segment
     this.username = username
     this.roles = roles
     this.isAdmin = is_admin
@@ -23,7 +23,6 @@ class User {
     this.invitedBy = invited_by
     this.createdAt = created_at
     this.updatedAt = updated_at
-    this.url = url
   }
 }
 

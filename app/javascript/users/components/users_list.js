@@ -1,20 +1,21 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { observer } from 'mobx-react'
+import { user_path } from 'config/reverse_routes'
+
 
 @observer
 class UsersList extends Component {
   render() {
-    const users = this.props.store.all.map(user =>
+    const usersRows = this.props.store.all.map(user =>
       <tr key={user.id}>
-        <td>{user.displayName}</td>
+        <td><Link to={user_path(user)}>{user.displayName}</Link></td>
         <td>{user.email}</td>
         <td>{user.username}</td>
         <td>{user.roles.join(', ')}</td>
         <td>{user.isAdmin}</td>
         <td>{user.inviteKey}</td>
         <td>{user.invitedBy}</td>
-        <td>Show</td>
         <td>Edit</td>
         <td>Destroy</td>
       </tr>
@@ -22,7 +23,7 @@ class UsersList extends Component {
 
     return (
       <div>
-        <h1>List of users</h1>
+        <h1>List of users ({usersRows.length})</h1>
         <table>
           <thead>
             <tr>
@@ -33,17 +34,17 @@ class UsersList extends Component {
               <th>Is admin?</th>
               <th>Invite key</th>
               <th>Invited by</th>
-              <th colSpan={3}></th>
+              <th colSpan={2}></th>
             </tr>
           </thead>
           <tbody>
-            {users}
+            {usersRows}
           </tbody>
         </table>
+        {usersRows.length == 0 ? <div>Loading...</div> : undefined}
       </div>
     )
   }
 }
 
 export default UsersList
-

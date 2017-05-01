@@ -1,13 +1,16 @@
 import React, { Component } from 'react'
-import usersListStore from './model/users_list_store'
 import UsersList from './components/users_list'
 
 class IndexPage extends Component {
-  render() {
-    return (
-      <UsersList store={usersListStore}/>
-    )
+
+  componentWillMount() {
+    this.props.usersStore.fetchAll()
   }
+
+  render() {
+    return <UsersList store={this.props.usersStore} />
+  }
+
 }
 
 export default IndexPage

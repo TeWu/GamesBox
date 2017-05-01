@@ -30,6 +30,7 @@
     "rails-erb-loader": "^5.0.0",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
+    "react-forms": "^1.0.0-rc6",
     "react-router-dom": "^4.1.1",
     "sass-loader": "^6.0.3",
     "style-loader": "^0.16.1",
