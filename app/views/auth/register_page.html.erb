@@ -1,0 +1,58 @@
+<div><%= alert %><%= notice %></div>
+
+<div id="login-box-container">
+  <section id="logo" class="logo-big">
+    <h1>Register @ GamesBox</h1>
+  </section>
+  <div id="login-box">
+    <section id="content">
+      <%= form_for @user, url: registration_path do |f| %>
+        <% if @user.errors.any? %>
+          <div id="error_explanation">
+            <h2><%= pluralize(@user.errors.count, "error") %>:</h2>
+            <ul>
+            <% @user.errors.full_messages.each do |message| %>
+              <li class="error"><%= message %></li>
+            <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <section class="form-fields">
+          <dl>
+            <dt><%= f.label :registration_invite_key %></dt>
+            <dd>
+              <%= f.text_field :registration_invite_key, value: @invite_key %>
+              <% if @invite_key_error %>
+                <span class="error"><%= @invite_key_error %>. Please ask already registered user for a key.</span>
+              <% end %>
+            </dd>
+          </dl>
+          <dl>
+            <dt><%= f.label :username %></dt>
+            <dd><%= f.text_field :username %></dd>
+          </dl>
+          <dl>
+            <dt><%= f.label :password %></dt>
+            <dd><%= f.password_field :password  %></dd>
+          </dl>
+          <dl>
+            <dt><%= f.label :password_confirmation %></dt>
+            <dd><%= f.password_field :password_confirmation %></dd>
+          </dl>
+          <dl>
+            <dt><%= f.label :display_name %></dt>
+            <dd><%= f.text_field :display_name %></dd>
+          </dl>
+          <dl>
+            <dt><%= f.label :email %></dt>
+            <dd><%= f.text_field :email %></dd>
+          </dl>
+        </section>
+        <section class="form-actions">
+          <%= f.submit "Register", class: 'btn btn-default' %>
+        </section>
+      <% end %>
+    </section>
+  </div>
+</div>

@@ -6,6 +6,8 @@ Rails.application.routes.draw do
   get 'login' => 'auth#login_page'
   post 'login' => 'auth#login'
   delete 'logout' => 'auth#logout'
+  get 'register' => 'auth#register_page', as: :registration
+  post 'register' => 'auth#register'
 
   get 'users/(:id/(edit))' => 'single_page_apps#main', as: :main_app
 

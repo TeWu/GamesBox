@@ -22,6 +22,13 @@ class User < ApplicationRecord
   attr_accessor :password, :password_confirmation
 
 
+  def self.get_inviter_by_key(invite_key)
+    inviters = User.where(invite_key: invite_key)
+    return "Invalid invite key" unless inviters.any?
+    return "Duplicated invite key" if inviters.many?
+    return inviters.first
+  end
+
   def self.authenticate(username, password)
     user = find_by username: username
     return user if user && GamesBox::Crypt.verify_password(password, user.passhash)

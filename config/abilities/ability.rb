@@ -7,8 +7,7 @@ class Ability < BaseAbility
   protected
 
   def logged_in user
-    can :manage, :all
-    cannot :delete, :all
+    can [:read, :update], main_models
   end
 
   def active user
@@ -32,7 +31,7 @@ class Ability < BaseAbility
 
   ### Subject groups ###
   def main_models
-    @main_models ||= []
+    @main_models ||= [User]
   end
 
 end

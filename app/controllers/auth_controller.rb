@@ -22,4 +22,29 @@ class AuthController < ApplicationController
     redirect_to login_path, notice: "Logged out"
   end
 
+  def register_page
+    @user = User.new
+    @invite_key = params[:key]
+  end
+
+  def register
+    @invite_key = params.require(:user)[:registration_invite_key]
+    inviter = User.get_inviter_by_key(@invite_key)
+    if inviter.is_a? User
+      user_params = params.require(:user)
+                          .permit(:username, :password, :password_confirmation, :display_name, :email)
+                          .merge(invited_by: inviter, roles: GamesBox::CONFIG[:new_user_roles_default])
+      @user = User.new(user_params)
+      if @user.save
+        redirect_to login_path, flash: {username: @user.username, notice: "User registered successfully"}
+      else
+        render :register_page
+      end
+    else
+      @user = User.new
+      @invite_key_error = inviter
+      render :register_page
+    end
+  end
+
 end
