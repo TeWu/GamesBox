@@ -6,14 +6,10 @@ module Api
       @users = User.all
     end
 
-    def new
-      @user = User.new
-    end
-
     def create
       @user = User.new(user_params)
       if @user.save
-        render :show, status: :created, location: @user
+        render :show, status: :created, location: api_user_path(@user)
       else
         render json: @user.errors, status: :unprocessable_entity
       end
@@ -21,7 +17,7 @@ module Api
 
     def update
       if @user.update(user_params)
-        render :show, status: :ok, location: @user
+        render :show, status: :ok, location: api_user_path(@user)
       else
         render json: @user.errors, status: :unprocessable_entity
       end
@@ -34,7 +30,7 @@ module Api
 
     private
     def user_params
-      params.require(:user).permit(:username, :password, :password_confirmation, :roles_bitmask, :display_name, :email)
+      params.require(:user).permit(:username, :password, :password_confirmation, :roles_bitmask, :display_name, :email, :invite_key)
     end
   end
 end

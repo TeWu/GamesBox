@@ -1,11 +1,17 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { observer } from 'mobx-react'
-import { user_path } from 'config/reverse_routes'
+import { user_path, edit_user_path } from 'config/reverse_routes'
 
 
 @observer
 class UsersList extends Component {
+
+  deleteUser(user) {
+    if (confirm(`Do you want to DELETE user ${user.displayName} ?`))
+      this.props.store.delete(user.urlSegment)
+  }
+
   render() {
     const usersRows = this.props.store.all.map(user =>
       <tr key={user.id}>
@@ -16,8 +22,8 @@ class UsersList extends Component {
         <td>{user.isAdmin}</td>
         <td>{user.inviteKey}</td>
         <td>{user.invitedBy}</td>
-        <td>Edit</td>
-        <td>Destroy</td>
+        <td><Link to={edit_user_path(user)}>Edit</Link></td>
+        <td><button onClick={this.deleteUser.bind(this, user)}>Destroy</button></td>
       </tr>
     )
 

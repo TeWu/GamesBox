@@ -7,7 +7,7 @@ Rails.application.routes.draw do
   post 'login' => 'auth#login'
   delete 'logout' => 'auth#logout'
 
-  get 'users/(:id)' => 'single_page_apps#main', as: :main_app
+  get 'users/(:id/(edit))' => 'single_page_apps#main', as: :main_app
 
   namespace :api, **json_only do
     resources :users, except: [:new, :edit]
