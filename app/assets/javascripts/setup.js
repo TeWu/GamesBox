@@ -1,0 +1,1 @@
+this.App || (this.App = {})
