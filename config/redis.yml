@@ -1,0 +1,17 @@
+# Available options:
+#   http://www.rubydoc.info/github/redis/redis-rb/Redis#initialize-instance_method
+
+default:
+  host: localhost
+  port: 6379
+  password: # TODO: secure redis with password
+
+
+development:
+  db: 0
+
+test:
+  db: 1
+
+production:
+  db: 2
