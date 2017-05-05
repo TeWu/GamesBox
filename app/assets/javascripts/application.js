@@ -2,3 +2,4 @@
 
 //= require setup
 //= require cable
+//= require games

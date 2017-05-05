@@ -1,0 +1,7 @@
+<%
+games = GamesBox::GAMES.map do |k,v|
+  [k, v.map{|k,v| [k.camelize(:lower), v] }.to_h]
+end.to_h.to_json
+%>
+
+this.App.games = <%= games %>
