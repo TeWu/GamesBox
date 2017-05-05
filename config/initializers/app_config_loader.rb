@@ -1,6 +1,6 @@
 module GamesBox
-  raw_config = File.read File.join(Rails.root, 'config', 'app_config.yml')
-  CONFIG = YAML.load(raw_config)[Rails.env].with_indifferent_access
+  configs = YAML.load( File.read File.join(Rails.root, 'config', 'app_config.yml') )
+  CONFIG = configs['default'].merge(configs[Rails.env] || {}).with_indifferent_access
 
   ##----- Additional config processing -----#
   CONFIG[:roles_values] = CONFIG[:roles].map { |role, i| [role, 2**i] }.to_h

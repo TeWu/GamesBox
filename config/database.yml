@@ -17,4 +17,4 @@ test:
 
 production:
   <<: *default
-  database: gamesbox_production
+  database: gamesbox

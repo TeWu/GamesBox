@@ -1,4 +1,4 @@
-default: &default
+default:
   # Roles are defined like 'role_name: position_in_roles_bitmask'.
   # NOTE: Roles should be positioned from the least to the most privileged (because of how permissions are defined in Ability class).
   # NOTE: roles bitmask is usually 32 bits (4 bytes) long +- sign bit.
@@ -8,8 +8,7 @@ default: &default
 
 
 development:
-  <<: *default
+
 test:
-  <<: *default
+
 production:
-  <<: *default
