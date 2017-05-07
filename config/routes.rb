@@ -9,8 +9,8 @@ Rails.application.routes.draw do
   get 'register' => 'auth#register_page', as: :registration
   post 'register' => 'auth#register'
 
-  get 'users/(:id/(edit))' => 'single_page_apps#main', as: :main_app
-  get 'games/(:id/(:session_id))' => 'single_page_apps#main'
+  get 'users/(:id/(edit))' => 'single_page_apps#main'
+  get 'games/(:id/(:session_id))' => 'single_page_apps#main', as: :main_app
 
   namespace :api, **json_only do
     resources :users, except: [:new, :edit]

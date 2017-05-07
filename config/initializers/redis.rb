@@ -12,6 +12,11 @@ module GamesBox
                     [name, sha]
                   end.to_h.with_indifferent_access.freeze
 
+  # Define evalscript helper
+  def $redis.eval_script(name, *args)
+    evalsha(REDIS_SCRIPTS[name], *args)
+  end
+
   # Remove all keys from test database
   $redis.flushdb if Rails.env == "test"
 end

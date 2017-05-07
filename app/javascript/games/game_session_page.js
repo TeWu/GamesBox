@@ -11,10 +11,11 @@ class GameSessionPage extends Component {
   }
 
   componentWillMount() {
-    this.gameSessionChannel = GameSessionChannel.create(`game-ses:${this.game.urlSegment}:${this.sessionId}`)
+    this.gameSessionChannel = GameSessionChannel.create(this.game.urlSegment, this.sessionId)
   }
 
   componentWillUnmount() {
+    this.gameSessionChannel.prepareToUnsubscribe()
     this.gameSessionChannel.unsubscribe()
   }
 
