@@ -14,7 +14,7 @@ const mixin = {
 
   subscribed: function () {
     console.log("GameSessionChannel subscribed")
-    this.send_msg('join')
+    this.sendTyped('get_state')
   },
 
   /* Called when the subscription is rejected by the server */
@@ -31,8 +31,7 @@ const mixin = {
     const [type, payload] = data
 
     switch (type) {
-      case 'join_accepted':
-        this.send_msg('get_state')
+      case 'join_rejected':
         break
       case 'current_state':
         this.state = payload
@@ -40,8 +39,8 @@ const mixin = {
     }
   },
 
-  send_msg: function (type, payload = null) {
-    this.send({ m: [type, payload] })
+  sendTyped: function (type, payload = null) {
+    this.send({ data: [type, payload] })
   }
 
 }
