@@ -1,28 +1,26 @@
 import React, { Component } from 'react'
-import GameSessionChannel from 'cable/game_session_channel'
+import BlackHoleGameComponent from './games/black_hole/component'
 const games = window.App.games
+
+
+const GAME_COMPONENTS = {
+  'black-hole': BlackHoleGameComponent
+}
 
 class GameSessionPage extends Component {
 
   constructor(props) {
     super(props)
-    this.game = games[props.match.params.game]
+    this.gameInfo = games[props.match.params.game]
     this.sessionId = props.match.params.sessionId
-  }
-
-  componentWillMount() {
-    this.gameSessionChannel = GameSessionChannel.create(this.game.urlSegment, this.sessionId)
-  }
-
-  componentWillUnmount() {
-    this.gameSessionChannel.prepareToUnsubscribe()
-    this.gameSessionChannel.unsubscribe()
+    this.gameComponent = React.createElement(
+      GAME_COMPONENTS[this.gameInfo.urlSegment],
+      { gameInfo: this.gameInfo, sessionId: this.sessionId }
+    )
   }
 
   render() {
-    return <div>
-      <h1>{this.game.name} game session {this.sessionId}</h1>
-    </div>
+    return this.gameComponent
   }
 
 }
