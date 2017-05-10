@@ -44,13 +44,6 @@ function createProxyMixin(channel) {
     rejected: function () { },
     received: function (data) {
       if (data.constructor === Array) {
-        // if (data[0] == '_AC:GBBC_unsubscribed') {
-        //   if (isSubscribed) {
-        //     isSubscribed = false
-        //     this.target.unsubscribed()
-        //   }
-        //   return
-        // }
         if (data[0] == '_AC:GBBC_rejected') {
           this.target.rejected(data[1])
           return
