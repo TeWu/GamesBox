@@ -3,7 +3,7 @@ import { observer } from 'mobx-react'
 import serialize from 'form-serialize'
 
 import User from 'users/model/user'
-import { TextField, PasswordField } from 'form_helpers/form_fields'
+import { TextField, PasswordField } from 'utils/form_fields'
 
 
 @observer

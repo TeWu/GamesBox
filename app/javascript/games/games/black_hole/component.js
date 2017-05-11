@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import P5 from 'utils/p5_component'
 import BlackHoleGame from './game'
 const games = window.App.games
 
@@ -28,6 +29,7 @@ class BlackHoleGameComponent extends Component {
         <p>
           <strong>{p0}</strong> vs <strong>{p1}</strong>
         </p>
+        <P5 sketch={this.game.sketch} bigC="violet" />
       </div>
     )
   }
