@@ -13,6 +13,14 @@ class Board {
     }
   }
 
+  setFromRedis(redisBoard) {
+    for (let redisCircleAddr in redisBoard) {
+      const [i, j] = redisCircleAddr.split(':').map(x => parseInt(x))
+      const [value, playerNum] = redisBoard[redisCircleAddr].split(',').map(x => parseInt(x))
+      this.content[i][j] = new BoardCircle(i, j).setValueAndPlayer(value, { num: playerNum })
+    }
+  }
+
   get(i, j) { return this.content[i][j] }
 
   findCircleUnderTheMouse(p5) {

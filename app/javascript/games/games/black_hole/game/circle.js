@@ -1,4 +1,4 @@
-import { BOARD_SIZE, CIRCLE_RADIUS, EMPTY_CIRCLE_COLOR, PLAYER_COLORS } from '../config'
+import { BOARD_SIZE, CIRCLE_RADIUS, EMPTY_CIRCLE_COLOR, BLACK_HOLE_CIRCLE_COLOR, PLAYER_COLORS } from '../config'
 import Color from 'tinycolor2'
 
 
@@ -15,10 +15,17 @@ class Circle {
     this.color = player == null ? EMPTY_CIRCLE_COLOR : PLAYER_COLORS[player.num]
     this.borderWeight = this.value + 1
     this.radius = CIRCLE_RADIUS - Math.floor(this.value / 2)
+    return this
   }
 
   transformInto(circle) {
     this.setValueAndPlayer(circle.value, circle.player)
+    return this
+  }
+
+  transformIntoBlackHole() {
+    this.color = BLACK_HOLE_CIRCLE_COLOR
+    return this
   }
 
   empty() { this.setValueAndPlayer(0, null) }

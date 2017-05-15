@@ -17,7 +17,7 @@ class Rack {
   get head() { return this.content[0] }
   get(i) { return this.content[i] }
   shift() { return this.content.shift() }
-  unshift() { return this.content.unshift() }
+  unshift(circle) { return this.content.unshift(circle) }
 
   isEmpty() { return this.content.length == 0 }
   nonEmpty() { return this.content.length > 0 }

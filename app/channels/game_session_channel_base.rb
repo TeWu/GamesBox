@@ -7,7 +7,7 @@ class GameSessionChannelBase < ApplicationCable::Channel
     outcome, player_num, players = join_game_session
     if outcome != :session_full
       initialize_state if players.compact.size == 1
-      broadcast(:player_joined, {num: player_num, name: current_player_name}) if outcome == :joined
+      broadcast(:player_joined, {num: player_num, name: current_user_name}) if outcome == :joined
       stream_from channel_id
     else
       reject(reason: :session_full)
@@ -39,17 +39,17 @@ class GameSessionChannelBase < ApplicationCable::Channel
     order = join_order
     outcome, players = $redis.eval_script(:join_game_session,
                                            order,
-                                           [redis_key(:players), current_player_name,
+                                           [redis_key(:players), current_user_name,
                                             redis_key(:players, :subs), current_user.id]
                                          )
-    player_num = outcome == 'session_full' ? nil : order[players.index(current_player_name)]
+    player_num = outcome == 'session_full' ? nil : order[players.index(current_user_name)]
     [outcome.to_sym, player_num, players]
   end
 
   def leave_game_session
     outcome, is_session_empty, *rest = $redis.eval_script(:leave_game_session,
                                          [redis_key(:players), redis_key(:players, :subs), current_user.id],
-                                         [current_player_name]
+                                         [current_user_name]
                                        )
     player_num = outcome == 'left' ? rest.shift : nil
     [outcome.to_sym, !!is_session_empty, player_num, *rest]
@@ -62,7 +62,7 @@ class GameSessionChannelBase < ApplicationCable::Channel
     state
   end
 
-  def current_player_name
+  def current_user_name
     current_user.display_name
   end
 

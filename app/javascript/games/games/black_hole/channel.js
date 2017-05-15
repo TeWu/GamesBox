@@ -28,9 +28,8 @@ class BlackHoleGameChannel extends GameSessionChannelBase {
     switch (type) {
       case 'current_state':
         if (this.game.phase == PHASE.initializing) {
-          const startingPlayer = payload.starting_player
+          const currentPlayerNum = payload.current_player
           const turnNum = payload.turn_num || 0
-          const currentPlayerNum = turnNum % 2 == 0 ? startingPlayer : (1 - startingPlayer)
           this.game.initialize(payload.board, turnNum, currentPlayerNum)
         }
         break
@@ -47,8 +46,10 @@ class BlackHoleGameChannel extends GameSessionChannelBase {
         else if (this.game.phase != PHASE.initializing) this.game.onRemoteMove(i, j)
         break
       case 'move_rejected':
-        if (this.game.phase == waiting_for_move_confirmation && payload == this.game.turnNum)
+        if (this.game.phase == waiting_for_move_confirmation && payload.turn_num == this.game.turnNum) {
+          console.error("Move rejected by the server: " + payload.reason)
           this.game.onRejectMove()
+        }
         break
     }
   }

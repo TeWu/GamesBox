@@ -24,15 +24,13 @@ class BlackHoleGame {
     this.channel = null
   }
 
-  initialize(board, turnNum, currentPlayerNum) {
+  initialize(redisBoard, turnNum, currentPlayerNum) {
     this.turnNum = turnNum
     this.currentPlayerNum = currentPlayerNum
     const rackBase = Math.floor(turnNum / 2) + 1
     this.racks[currentPlayerNum].fill(rackBase)
     this.racks[1 - currentPlayerNum].fill(rackBase + (turnNum % 2))
-
-    // TODO:  set board
-
+    this.board.setFromRedis(redisBoard)
     this.startNewTurn()
   }
 
