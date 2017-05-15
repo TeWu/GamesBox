@@ -1,36 +1,156 @@
 import BlackHoleGameChannel from './channel'
+import { BOARD_SIZE, CIRCLES_IN_RACK, CIRCLE_RADIUS, PLAYER_COLORS, PHASE } from './config'
+import Rack from './game/rack'
+import Board from './game/board'
+const { waiting_for_players, local_move, remote_move, waiting_for_move_confirmation } = PHASE
 
 
 class BlackHoleGame {
 
   constructor(component) {
     this.component = component
-    this.channel = new BlackHoleGameChannel(component, self).subscribe()
+    this.channel = new BlackHoleGameChannel(component, this).subscribe()
+    this.sketch = this.sketch.bind(this, this)
 
-    this.sketch = function (initialProps, p) {
-      p.setup = function () {
-        p.frameRate(1)
-        p.createCanvas(200, 150)
-        p.background(220)
-      }
-
-      p.draw = function () {
-        p.fill("#" + (Math.round(Math.random() * 1000000)))
-        p.ellipse(20, 20, 100, 100)
-        p.fill(p.color(initialProps.bigC || '#7c9'))
-        p.ellipse(140, 140, 200, 200)
-      }
-
-      p.mousePressed = function () {
-        p.redraw()
-      }
-    }
-
+    this.players = [null, null]
+    this.isPlayerLocal = [null, null]
+    this.racks = [new Rack({ num: 0 }), new Rack({ num: 1 })]
+    this.board = new Board
+    this.phase = PHASE.initializing
   }
 
   finalize() {
     this.channel.unsubscribe()
     this.channel = null
+  }
+
+  initialize(board, turnNum, currentPlayerNum) {
+    this.turnNum = turnNum
+    this.currentPlayerNum = currentPlayerNum
+    const rackBase = Math.floor(turnNum / 2) + 1
+    this.racks[currentPlayerNum].fill(rackBase)
+    this.racks[1 - currentPlayerNum].fill(rackBase + (turnNum % 2))
+
+    // TODO:  set board
+
+    this.startNewTurn()
+  }
+
+  get currentPlayer() { return this.players[this.currentPlayerNum] }
+  isCurrentPlayerLocal() { return this.isPlayerLocal[this.currentPlayerNum] }
+  get currentRack() { return this.racks[this.currentPlayerNum] }
+
+  // TODO: rewiew correctness of 'onPlayersChange' on finished game - also make sure that leaving and rejoining the game works corectly
+  onPlayersChange() {
+    if (this.phase != PHASE.initializing) {
+      if (this.players.some(p => p == null)) {
+        if (this.phase == remote_move) this.waitForPlayers()
+      } else if (this.phase == waiting_for_players) {
+        this.startNewTurn()
+      }
+    }
+  }
+
+  waitForPlayers() {
+    this.currentRack.head.stopFx()
+    this.phase = waiting_for_players
+  }
+
+  onRemoteMove(i, j) {
+    this.showMove(this.board.get(i, j))
+    this.endTurn()
+  }
+
+  onConfirmMove() {
+    this.endTurn()
+  }
+
+  onRejectMove() {
+    this.lastMove.revert()
+    this.lastMove = null
+    this.phase = local_move
+  }
+
+  makeMove(boardCircle) {
+    this.showMove(boardCircle)
+    this.channel.sendMove(boardCircle.i, boardCircle.j)
+    this.phase = waiting_for_move_confirmation
+  }
+
+  showMove(boardCircle) {
+    const removedCircle = this.currentRack.shift()
+    boardCircle.transformInto(removedCircle)
+    this.lastMove = {
+      i: boardCircle.i,
+      j: boardCircle.j,
+      is: (i, j) => i == boardCircle.i && j == boardCircle.j,
+      revert: () => {
+        this.currentRack.unshift(removedCircle)
+        boardCircle.empty()
+      }
+    }
+  }
+
+  startNewTurn() {
+    if (this.currentPlayer == null) this.waitForPlayers()
+    else {
+      this.phase = this.isCurrentPlayerLocal() ? local_move : remote_move
+      this.currentRack.head.blink()
+    }
+  }
+
+  endTurn() {
+    this.turnNum++
+    this.currentPlayerNum = this.currentPlayerNum == 0 ? 1 : 0
+    if (this.currentRack.nonEmpty()) this.startNewTurn()
+    else this.endGame()
+  }
+
+  endGame() {
+    console.log("=== END GAME ===")
+    this.phase = PHASE.ended
+  }
+
+  sketch(game, _, p) {
+
+    p.setup = function () {
+      p.colorMode(p.HSB, 255)
+      p.frameRate(30)
+      const boardSizeBase = CIRCLE_RADIUS * BOARD_SIZE + 1
+      const canvas = p.createCanvas(3 * boardSizeBase, 2 * boardSizeBase)
+      canvas.mouseClicked(mouseClicked)
+    }
+
+    p.draw = function () {
+      p.background(210)
+      game.racks[0].draw(p)
+      game.racks[1].draw(p)
+      game.board.draw(p)
+
+      if (game.phase == waiting_for_players) {
+        p.textSize(27)
+        p.text("Waiting for second player...", p.width / 2 - 155, p.height - 15)
+      }
+
+      const player0 = game.players[0] ? game.players[0].name : '...'
+      const player1 = game.players[1] ? game.players[1].name : '...'
+      p.textSize(27)
+      p.text(`${player0} vs ${player1}`, 5, 30)
+      p.text(`current player num: ${game.currentPlayerNum}`, 420, 30)
+      p.text(`phase: ${game.phase}`, 540, 55)
+      p.textSize(17)
+      p.text(`turn: ${game.turnNum}`, 580, 75)
+    }
+
+    const mouseClicked = function () {
+      if (game.phase == local_move) {
+        const circle = game.board.findCircleUnderTheMouse(p)
+        if (circle && circle.isEmpty())
+          game.makeMove(circle)
+      }
+      return false
+    }
+
   }
 
 }

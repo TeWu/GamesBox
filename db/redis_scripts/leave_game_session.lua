@@ -16,12 +16,12 @@ if incr_res == 0 then
   end
 
   if player_num == nil then
-    return {"already_left"}
+    return {"already_left", get_res_len == 0}
   else
     redis.call('HDEL', KEYS[1], player_num)
-    return {"left", player_num}
+    return {"left", get_res_len == 2, player_num}
   end
 
 else
-  return {"not_last_subscription", incr_res}
+  return {"not_last_subscription", false, incr_res}
 end

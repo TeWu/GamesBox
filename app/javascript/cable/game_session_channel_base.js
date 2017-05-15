@@ -1,4 +1,8 @@
 import ActionCableChannelAdapter from 'cable/action_cable_channel_adapter'
+const currentUser = window.App.currentUser
+
+
+const isStateInitialized = Symbol()
 
 class GameSessionChannelBase extends ActionCableChannelAdapter {
 
@@ -6,7 +10,6 @@ class GameSessionChannelBase extends ActionCableChannelAdapter {
     super()
     this.component = component
     this.game = game
-    this.isStateInitialized = false
   }
 
   subscribed() { this.send('get_state') }
@@ -15,22 +18,40 @@ class GameSessionChannelBase extends ActionCableChannelAdapter {
     const [type, payload] = data
 
     switch (type) {
-      case 'current_state':
-        if (!this.isStateInitialized) {
-          this.isStateInitialized = true
+      case 'current_state': {
+        if (!this[isStateInitialized]) {
+          this[isStateInitialized] = true
           this.component.setState({ players: payload.players })
-          break
+
+          for (let i = 0; i < payload.players.length; i++)
+            if (payload.players[i]) {
+              this.game.players[i] = { name: payload.players[i] }
+              this.game.isPlayerLocal[i] = payload.players[i] == currentUser.displayName
+            }
+          this.game.onPlayersChange()
         }
+        break
+      }
       case 'player_joined': {
         const players = this.component.state.players
         players[parseInt(payload.num)] = payload.name
         this.component.setState({ players: players })
-      }
+
+        const idx = parseInt(payload.num)
+        this.game.players[idx] = { name: payload.name }
+        this.game.isPlayerLocal[idx] = payload.name == currentUser.displayName
+        this.game.onPlayersChange()
         break
+      }
       case 'player_left': {
         const players = this.component.state.players
         players[parseInt(payload)] = null
         this.component.setState({ players: players })
+
+        const idx = parseInt(payload)
+        this.game.players[idx] = null
+        this.game.isPlayerLocal[idx] = null
+        this.game.onPlayersChange()
         break
       }
     }

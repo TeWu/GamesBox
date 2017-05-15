@@ -29,7 +29,7 @@ class BlackHoleGameComponent extends Component {
         <p>
           <strong>{p0}</strong> vs <strong>{p1}</strong>
         </p>
-        <P5 sketch={this.game.sketch} bigC="violet" />
+        <P5 sketch={this.game.sketch} />
       </div>
     )
   }
