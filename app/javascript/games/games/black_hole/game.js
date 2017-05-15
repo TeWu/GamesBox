@@ -48,6 +48,7 @@ class BlackHoleGame {
         this.startNewTurn()
       }
     }
+    this.component.setState({ players: this.players })
   }
 
   waitForPlayers() {

@@ -21,12 +21,11 @@ class BlackHoleGameComponent extends Component {
   }
 
   render() {
-    const p0 = this.state.players[0] || "..."
-    const p1 = this.state.players[1] || "..."
+    const players = this.state.players.map(p => p ? p.name : "...")
     return (
       <div>
         <h1>{this.props.gameInfo.name} game session {this.props.sessionId}</h1>
-        <h2>{p0} vs {p1}</h2>
+        <h2>{players[0]} vs {players[1]}</h2>
         <P5 sketch={this.game.sketch} />
       </div>
     )
