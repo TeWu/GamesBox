@@ -23,6 +23,13 @@ class Board {
 
   get(i, j) { return this.content[i][j] }
 
+  findNeighbours(circle) {
+    return Board.Neighbourhood.map(addr => {
+      const col = this.content[circle.i + addr[0]]
+      if (col) return col[circle.j + addr[1]]
+    }).filter(x => x !== undefined)
+  }
+
   findCircleUnderTheMouse(p5) {
     for (let i = 0; i < BOARD_SIZE; i++)
       for (let j = 0; j <= i; j++)
@@ -40,5 +47,10 @@ class Board {
   }
 
 }
+Board.Neighbourhood = [
+  [-1, -1], [0, -1],
+  [-1, 0], [1, 0],
+  [0, 1], [1, 1]
+]
 
 export default Board

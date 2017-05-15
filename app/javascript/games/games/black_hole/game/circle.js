@@ -62,15 +62,6 @@ class Circle {
     p5.ellipse(x, y, this.radius * 2, this.radius * 2)
     p5.fill(0)
 
-    if (this.i != null) {
-      p5.textSize(12)
-      p5.fill("white")
-      p5.text(`${this.i}, ${this.j}`, this.x - 10, this.y + 20)
-      p5.fill("yellow")
-      const idx = (this.i / 2) * (this.i + 1) + this.j
-      p5.text(`${idx}`, this.x - 3, this.y + 35)
-      p5.fill("black")
-    }
     if (this.value > 0) {
       p5.textSize(52)
       p5.text(this.value, x - CIRCLE_RADIUS / 3 - Math.floor(Math.log10(this.value)) * 17, y + CIRCLE_RADIUS / 2)
@@ -82,7 +73,7 @@ class Circle {
   blink() {
     this.fx = Circle.FX.blink
     this.color1 = this.color
-    this.color2 = Color(this.color).spin(6).saturate(100).darken(10).toHexString()
+    this.color2 = Color(this.color).spin(6).saturate(110).darken(14).toHexString()
     this.colorBlend = 0
     this.colorBlendStep = 0.02
   }

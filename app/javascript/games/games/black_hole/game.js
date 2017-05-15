@@ -2,7 +2,7 @@ import BlackHoleGameChannel from './channel'
 import { BOARD_SIZE, CIRCLES_IN_RACK, CIRCLE_RADIUS, PLAYER_COLORS, PHASE } from './config'
 import Rack from './game/rack'
 import Board from './game/board'
-const { waiting_for_players, local_move, remote_move, waiting_for_move_confirmation } = PHASE
+const { waiting_for_players, local_move, remote_move, waiting_for_move_confirmation, waiting_for_scores } = PHASE
 
 
 class BlackHoleGame {
@@ -24,14 +24,15 @@ class BlackHoleGame {
     this.channel = null
   }
 
-  initialize(redisBoard, turnNum, currentPlayerNum) {
+  initialize(redisBoard, turnNum, currentPlayerNum, blackHoleAddr, scores, winningPlayerName) {
     this.turnNum = turnNum
     this.currentPlayerNum = currentPlayerNum
     const rackBase = Math.floor(turnNum / 2) + 1
     this.racks[currentPlayerNum].fill(rackBase)
     this.racks[1 - currentPlayerNum].fill(rackBase + (turnNum % 2))
     this.board.setFromRedis(redisBoard)
-    this.startNewTurn()
+    if (blackHoleAddr) this.endGame(blackHoleAddr, scores, winningPlayerName)
+    else this.startNewTurn()
   }
 
   get currentPlayer() { return this.players[this.currentPlayerNum] }
@@ -101,11 +102,19 @@ class BlackHoleGame {
     this.turnNum++
     this.currentPlayerNum = this.currentPlayerNum == 0 ? 1 : 0
     if (this.currentRack.nonEmpty()) this.startNewTurn()
-    else this.endGame()
+    else this.waitForScores()
   }
 
-  endGame() {
-    console.log("=== END GAME ===")
+  waitForScores() {
+    this.phase = waiting_for_scores
+  }
+
+  endGame(blackHoleAddr, scores, winningPlayerName) {
+    const blackHole = this.board.get(blackHoleAddr.i, blackHoleAddr.j).transformIntoBlackHole()
+    this.scores = scores
+    this.winningPlayerName = winningPlayerName
+    this.board.findNeighbours(blackHole)
+      .forEach(circle => circle.blink())
     this.phase = PHASE.ended
   }
 
@@ -129,11 +138,15 @@ class BlackHoleGame {
         p.textSize(27)
         p.text("Waiting for second player...", p.width / 2 - 155, p.height - 15)
       }
+      else if (game.phase == PHASE.ended) {
+        p.textSize(36)
+        const resultText = game.winningPlayerName ? game.winningPlayerName + " wins!" : "Game drawn!"
+        const fullText = resultText + "  " + game.scores.join('/')
+        const fullTextWidth = p.drawingContext.measureText(fullText).width
+        p.text(fullText, p.width / 2 - fullTextWidth / 2, p.height - 10)
+      }
 
-      const player0 = game.players[0] ? game.players[0].name : '...'
-      const player1 = game.players[1] ? game.players[1].name : '...'
       p.textSize(27)
-      p.text(`${player0} vs ${player1}`, 5, 30)
       p.text(`current player num: ${game.currentPlayerNum}`, 420, 30)
       p.text(`phase: ${game.phase}`, 540, 55)
       p.textSize(17)

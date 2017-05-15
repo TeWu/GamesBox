@@ -30,7 +30,7 @@ class BlackHoleGameChannel extends GameSessionChannelBase {
         if (this.game.phase == PHASE.initializing) {
           const currentPlayerNum = payload.current_player
           const turnNum = payload.turn_num || 0
-          this.game.initialize(payload.board, turnNum, currentPlayerNum)
+          this.game.initialize(payload.board, turnNum, currentPlayerNum, payload.black_hole, payload.scores, payload.winner_name)
         }
         break
       case 'move':
@@ -50,6 +50,9 @@ class BlackHoleGameChannel extends GameSessionChannelBase {
           console.error("Move rejected by the server: " + payload.reason)
           this.game.onRejectMove()
         }
+        break
+      case 'end_game':
+        this.game.endGame(payload.black_hole, payload.scores, payload.winner_name)
         break
     }
   }

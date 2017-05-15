@@ -26,9 +26,7 @@ class BlackHoleGameComponent extends Component {
     return (
       <div>
         <h1>{this.props.gameInfo.name} game session {this.props.sessionId}</h1>
-        <p>
-          <strong>{p0}</strong> vs <strong>{p1}</strong>
-        </p>
+        <h2>{p0} vs {p1}</h2>
         <P5 sketch={this.game.sketch} />
       </div>
     )

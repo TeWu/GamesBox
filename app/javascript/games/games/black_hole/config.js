@@ -11,5 +11,6 @@ export const PHASE = {
   local_move: 2,
   remote_move: 3,
   waiting_for_move_confirmation: 4,
-  ended: 5
+  waiting_for_scores: 5,
+  ended: 6
 }
