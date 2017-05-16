@@ -1,10 +1,12 @@
 import { observable } from 'mobx'
 import ObservableShallowSet from 'utils/mobx_observable_shallow_set'
 import BlackHoleGameChannel from './channel'
+import AudioManager from 'utils/audio_manager'
 import { BOARD_SIZE, CIRCLES_IN_RACK, CIRCLE_RADIUS, PLAYER_COLORS, PHASE } from './config'
 import Rack from './game/rack'
 import Board from './game/board'
 const { waiting_for_players, local_move, remote_move, waiting_for_move_confirmation, waiting_for_scores, rematch_requested } = PHASE
+const sounds = window.App.sounds
 
 
 class BlackHoleGame {
@@ -15,6 +17,7 @@ class BlackHoleGame {
   constructor(component) {
     this.component = component
     this.channel = new BlackHoleGameChannel(component, this).subscribe()
+    this.audioManager = new AudioManager
     this.sketch = this.sketch.bind(this, this)
 
     this.players = observable.shallowArray([null, null])
@@ -65,8 +68,8 @@ class BlackHoleGame {
       } else if (this.phase == waiting_for_players) {
         this.startNewTurn()
       }
+      if (type == 'player_left') this.rematchRequestingPlayers.delete(playerNum)
     }
-    if (type == 'player_left') this.rematchRequestingPlayers.delete(playerNum)
   }
 
   waitForPlayers() {
@@ -107,6 +110,7 @@ class BlackHoleGame {
         boardCircle.empty()
       }
     }
+    this.audioManager.get('board_tap').start()
   }
 
   startNewTurn() {
@@ -154,6 +158,12 @@ class BlackHoleGame {
 
 
   sketch(game, _, p) {
+
+    p.preload = function () {
+      game.audioManager.load({
+        board_tap: sounds.board_tap
+      })
+    }
 
     p.setup = function () {
       p.colorMode(p.HSB, 255)
