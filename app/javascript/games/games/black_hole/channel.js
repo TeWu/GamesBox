@@ -30,7 +30,7 @@ class BlackHoleGameChannel extends GameSessionChannelBase {
         if (this.game.phase == PHASE.initializing) {
           const currentPlayerNum = payload.current_player
           const turnNum = payload.turn_num || 0
-          this.game.initialize(payload.board, turnNum, currentPlayerNum, payload.black_hole, payload.scores, payload.winner_name)
+          this.game.initialize(payload.board, turnNum, currentPlayerNum, payload.black_hole, payload.scores, payload.winner_name, payload.rematch)
         }
         break
       case 'move':
@@ -52,7 +52,16 @@ class BlackHoleGameChannel extends GameSessionChannelBase {
         }
         break
       case 'end_game':
-        this.game.endGame(payload.black_hole, payload.scores, payload.winner_name)
+        if (this.game.phase != PHASE.initializing)
+          this.game.endGame(payload.black_hole, payload.scores, payload.winner_name)
+        break
+      case 'rematch_pending':
+        if (this.game.phase == PHASE.ended)
+          this.game.onRematchPending(payload)
+        break
+      case 'reset':
+        if (this.game.phase >= PHASE.ended)
+          this.game.onGameReset(payload)
         break
     }
   }
@@ -62,6 +71,9 @@ class BlackHoleGameChannel extends GameSessionChannelBase {
     this.send('move', { turn_num, i, j })
   }
 
+  sendRematchRequest(requestingPlayersNums) {
+    this.send('rematch_request', requestingPlayersNums)
+  }
 }
 
 export default BlackHoleGameChannel

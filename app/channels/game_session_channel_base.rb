@@ -12,13 +12,15 @@ class GameSessionChannelBase < ApplicationCable::Channel
     else
       reject(reason: :session_full)
     end
+    [outcome, player_num, players]
   end
 
   def unsubscribed
     return if subscription_rejected?
-    outcome, is_session_empty, player_num = leave_game_session
+    outcome, player_num, is_session_empty = leave_game_session
     broadcast(:player_left, player_num) if outcome == :left
     tear_down_state if is_session_empty
+    [outcome, player_num, is_session_empty]
   end
 
   def receive(data)
@@ -52,7 +54,7 @@ class GameSessionChannelBase < ApplicationCable::Channel
                                          [current_user_name]
                                        )
     player_num = outcome == 'left' ? rest.shift : nil
-    [outcome.to_sym, !!is_session_empty, player_num, *rest]
+    [outcome.to_sym, player_num, !!is_session_empty, *rest]
   end
 
   def get_state

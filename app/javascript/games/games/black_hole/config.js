@@ -12,5 +12,6 @@ export const PHASE = {
   remote_move: 3,
   waiting_for_move_confirmation: 4,
   waiting_for_scores: 5,
-  ended: 6
+  ended: 6,
+  rematch_requested: 7
 }

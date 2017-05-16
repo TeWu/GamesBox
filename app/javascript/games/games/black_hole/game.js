@@ -1,22 +1,27 @@
+import { observable } from 'mobx'
+import ObservableShallowSet from 'utils/mobx_observable_shallow_set'
 import BlackHoleGameChannel from './channel'
 import { BOARD_SIZE, CIRCLES_IN_RACK, CIRCLE_RADIUS, PLAYER_COLORS, PHASE } from './config'
 import Rack from './game/rack'
 import Board from './game/board'
-const { waiting_for_players, local_move, remote_move, waiting_for_move_confirmation, waiting_for_scores } = PHASE
+const { waiting_for_players, local_move, remote_move, waiting_for_move_confirmation, waiting_for_scores, rematch_requested } = PHASE
 
 
 class BlackHoleGame {
+
+  @observable phase
 
   constructor(component) {
     this.component = component
     this.channel = new BlackHoleGameChannel(component, this).subscribe()
     this.sketch = this.sketch.bind(this, this)
 
-    this.players = [null, null]
+    this.players = observable.shallowArray([null, null])
     this.isPlayerLocal = [null, null]
     this.racks = [new Rack({ num: 0 }), new Rack({ num: 1 })]
     this.board = new Board
     this.phase = PHASE.initializing
+    this.rematchRequestingPlayers = new ObservableShallowSet
   }
 
   finalize() {
@@ -24,7 +29,7 @@ class BlackHoleGame {
     this.channel = null
   }
 
-  initialize(redisBoard, turnNum, currentPlayerNum, blackHoleAddr, scores, winningPlayerName) {
+  initialize(redisBoard, turnNum, currentPlayerNum, blackHoleAddr, scores, winningPlayerName, rematchRequestingPlayers) {
     this.turnNum = turnNum
     this.currentPlayerNum = currentPlayerNum
     const rackBase = Math.floor(turnNum / 2) + 1
@@ -33,6 +38,18 @@ class BlackHoleGame {
     this.board.setFromRedis(redisBoard)
     if (blackHoleAddr) this.endGame(blackHoleAddr, scores, winningPlayerName)
     else this.startNewTurn()
+    if (rematchRequestingPlayers) this.onRematchPending(rematchRequestingPlayers)
+  }
+
+  onGameReset(startingPlayerNum) {
+    this.racks = [new Rack({ num: 0 }), new Rack({ num: 1 })]
+    this.racks.forEach(r => r.fill(1))
+    this.board = new Board
+    this.turnNum = 0
+    this.currentPlayerNum = startingPlayerNum
+    this.scores = this.winningPlayerName = undefined
+    this.rematchRequestingPlayers = new ObservableShallowSet
+    this.startNewTurn()
   }
 
   get currentPlayer() { return this.players[this.currentPlayerNum] }
@@ -40,7 +57,7 @@ class BlackHoleGame {
   get currentRack() { return this.racks[this.currentPlayerNum] }
 
   // TODO: rewiew correctness of 'onPlayersChange' on finished game - also make sure that leaving and rejoining the game works corectly
-  onPlayersChange() {
+  onPlayersChange(type, playerNum) {
     if (this.phase != PHASE.initializing) {
       if (this.players.some(p => p == null)) {
         if (this.phase == remote_move) this.waitForPlayers()
@@ -48,7 +65,7 @@ class BlackHoleGame {
         this.startNewTurn()
       }
     }
-    this.component.setState({ players: this.players })
+    if (type == 'player_left') this.rematchRequestingPlayers.delete(playerNum)
   }
 
   waitForPlayers() {
@@ -118,6 +135,22 @@ class BlackHoleGame {
       .forEach(circle => circle.blink())
     this.phase = PHASE.ended
   }
+
+  requestRematch() {
+    const requestingPlayersNums =
+      this.isPlayerLocal
+        .map((isLocal, i) => isLocal ? i : false)
+        .filter(x => x !== false)
+    this.channel.sendRematchRequest(requestingPlayersNums)
+    this.phase = rematch_requested
+  }
+
+  onRematchPending(requestingPlayersNums) {
+    this.rematchRequestingPlayers.addAll(
+      requestingPlayersNums.filter(n => !this.isPlayerLocal[n])
+    )
+  }
+
 
   sketch(game, _, p) {
 

@@ -16,8 +16,9 @@ BH = GamesBox::Games::BlackHole
 class BlackHoleGameChannel < GameSessionChannelBase
   self.game_id = 'black-hole'
 
-  def initialize_state
-    $redis.hset(redis_key, :current_player, rand(2))
+  def unsubscribed
+    _ , player_num = super
+    $redis.hdel(redis_key(:rematch), player_num)
   end
 
   def receive(data)
@@ -25,7 +26,14 @@ class BlackHoleGameChannel < GameSessionChannelBase
 
     case type
       when :move then move(**payload.symbolize_keys)
+      when :rematch_request then rematch_request(payload)
     end
+  end
+
+  def initialize_state
+    current_player = rand(2)
+    $redis.hset(redis_key, :current_player, current_player)
+    current_player
   end
 
   def get_state
@@ -35,6 +43,8 @@ class BlackHoleGameChannel < GameSessionChannelBase
                           .map {|k, v| [k, v.to_i] }.to_h
      scores = $redis.hgetall(redis_key(:scores))
      state[:scores] = ['0', '1'].map{|i| scores[i].to_i }
+     rematch = $redis.hkeys(redis_key(:rematch)).map(&:to_i)
+     state[:rematch] = rematch unless rematch.empty?
     end
     state
   end
@@ -49,6 +59,17 @@ class BlackHoleGameChannel < GameSessionChannelBase
       end_game if turn_num == 2 * BH::CONFIG[:circles_in_rack] - 1
     else
       deliver(:move_rejected, {turn_num: turn_num, reason: outcome})
+    end
+  end
+
+  def rematch_request(requesting_players)
+    requesting_players.each do |player_num|
+      $redis.hset(redis_key(:rematch), player_num, 1)
+    end
+    if $redis.hlen(redis_key(:rematch)) == 2
+      reset_game
+    else
+      broadcast(:rematch_pending, requesting_players)
     end
   end
 
@@ -83,6 +104,12 @@ class BlackHoleGameChannel < GameSessionChannelBase
 
   def get_board_data
     $redis.hgetall(redis_key(:board))
+  end
+
+  def reset_game
+    $redis.eval_script(:game_reset, [redis_key])
+    current_player = initialize_state
+    broadcast(:reset, current_player)
   end
 
 end

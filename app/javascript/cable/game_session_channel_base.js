@@ -26,7 +26,7 @@ class GameSessionChannelBase extends ActionCableChannelAdapter {
               this.game.players[i] = { name: payload.players[i] }
               this.game.isPlayerLocal[i] = payload.players[i] == currentUser.displayName
             }
-          this.game.onPlayersChange()
+          this.game.onPlayersChange('set', null)
         }
         break
       }
@@ -34,14 +34,14 @@ class GameSessionChannelBase extends ActionCableChannelAdapter {
         const idx = parseInt(payload.num)
         this.game.players[idx] = { name: payload.name }
         this.game.isPlayerLocal[idx] = payload.name == currentUser.displayName
-        this.game.onPlayersChange()
+        this.game.onPlayersChange('player_joined', idx)
         break
       }
       case 'player_left': {
         const idx = parseInt(payload)
+        this.game.onPlayersChange('player_left', idx)
         this.game.players[idx] = null
         this.game.isPlayerLocal[idx] = null
-        this.game.onPlayersChange()
         break
       }
     }
