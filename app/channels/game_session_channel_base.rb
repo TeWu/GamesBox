@@ -59,6 +59,7 @@ class GameSessionChannelBase < ApplicationCable::Channel
 
   def get_state
     state = $redis.hgetall(redis_key)
+    state.update(state) {|k,v| v.numeric? ? v.to_f : v }
     players = $redis.hgetall(redis_key(:players))
     state[:players] = ['0', '1'].map{|i| players[i] }
     state
