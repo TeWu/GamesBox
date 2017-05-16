@@ -1,8 +1,10 @@
 import React, { Component } from 'react'
 import { observer } from 'mobx-react'
+import classNames from 'classnames'
 import P5 from 'utils/p5_component'
 import BlackHoleGame from './game'
 import RematchControll from './components/rematch_controll'
+import { PHASE } from './config'
 const games = window.App.games
 
 
@@ -20,16 +22,16 @@ class BlackHoleGameComponent extends Component {
 
   render() {
     const players = this.game.players.map(p => p ? p.name : "...")
+    const currPlayer = this.game.currentPlayerNum
+    const gameOver = this.game.phase >= PHASE.ended
+
     return (
       <div>
         <h1>{this.props.gameInfo.name} game session {this.props.sessionId}</h1>
-        <div style={{
-          width: '723px', backgroundColor: '#bbb', fontSize: '32px',
-          padding: '5px', display: 'flex', justifyContent: 'space-between', boxSizing: 'border-box'
-        }}>
-          <span>{players[0]}</span>
-          <span>vs</span>
-          <span>{players[1]}</span>
+        <div class="game-board-header">
+          <span class={classNames('red-player', { 'active': currPlayer == 0 && !gameOver })}>{players[0]}</span>
+          <span class="players-divider" />
+          <span class={classNames('blue-player', { 'active': currPlayer == 1 && !gameOver })} >{players[1]}</span>
         </div>
         <P5 sketch={this.game.sketch} />
         <RematchControll game={this.game} />

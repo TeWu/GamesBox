@@ -1,0 +1,29 @@
+
+.game-board-header {
+  width: 723px;
+  display: flex;
+  justify-content: space-between;
+  background-color: #bbb;
+  font-size: 32px;
+
+  .red-player {
+    flex: 1;
+    padding: 5px;
+    padding-left: 13px;
+
+    &.active { background: linear-gradient(to top, #a66 6px, #dbb 6px) }
+  }
+
+  .blue-player {
+    flex: 1;
+    padding: 5px;
+    padding-right: 13px;
+    text-align: right;
+
+    &.active { background: linear-gradient(to top, #66a 6px, #bbd 6px) }
+  }
+
+  .players-divider {
+    flex: 2;
+  }
+}

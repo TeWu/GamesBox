@@ -10,6 +10,7 @@ const { waiting_for_players, local_move, remote_move, waiting_for_move_confirmat
 class BlackHoleGame {
 
   @observable phase
+  @observable currentPlayerNum
 
   constructor(component) {
     this.component = component
