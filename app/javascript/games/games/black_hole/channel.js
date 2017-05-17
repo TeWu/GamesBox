@@ -18,6 +18,12 @@ class BlackHoleGameChannel extends GameSessionChannelBase {
   unsubscribed() { console.log("unsubscribed") }
   disconnected() { console.log("disconnected") }
 
+  initializeState(state) {
+    const currentPlayerNum = state.current_player
+    const turnNum = state.turn_num || 0
+    this.game.initialize(state.board, turnNum, currentPlayerNum, state.black_hole, state.scores, state.winner_name, state.rematch)
+  }
+
   received(data) {
 
     console.log("received", JSON.stringify(data))
@@ -26,13 +32,6 @@ class BlackHoleGameChannel extends GameSessionChannelBase {
 
 
     switch (type) {
-      case 'current_state':
-        if (this.game.phase == PHASE.initializing) {
-          const currentPlayerNum = payload.current_player
-          const turnNum = payload.turn_num || 0
-          this.game.initialize(payload.board, turnNum, currentPlayerNum, payload.black_hole, payload.scores, payload.winner_name, payload.rematch)
-        }
-        break
       case 'move':
         const i = payload.i, j = payload.j
         if (this.game.phase == waiting_for_move_confirmation) {
@@ -43,7 +42,8 @@ class BlackHoleGameChannel extends GameSessionChannelBase {
             this.game.onRemoteMove(i, j)
           }
         }
-        else if (this.game.phase != PHASE.initializing) this.game.onRemoteMove(i, j)
+        else if (this.game.isInitialized())
+          this.game.onRemoteMove(i, j)
         break
       case 'move_rejected':
         if (this.game.phase == waiting_for_move_confirmation && payload.turn_num == this.game.turnNum) {
@@ -52,7 +52,7 @@ class BlackHoleGameChannel extends GameSessionChannelBase {
         }
         break
       case 'end_game':
-        if (this.game.phase != PHASE.initializing)
+        if (this.game.isInitialized())
           this.game.endGame(payload.black_hole, payload.scores, payload.winner_name)
         break
       case 'rematch_pending':

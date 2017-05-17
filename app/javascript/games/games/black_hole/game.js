@@ -56,20 +56,16 @@ class BlackHoleGame {
     this.startNewTurn()
   }
 
-  get currentPlayer() { return this.players[this.currentPlayerNum] }
+  isInitialized() { return this.phase != PHASE.initializing }
   isCurrentPlayerLocal() { return this.isPlayerLocal[this.currentPlayerNum] }
+  get currentPlayer() { return this.players[this.currentPlayerNum] }
   get currentRack() { return this.racks[this.currentPlayerNum] }
 
-  // TODO: rewiew correctness of 'onPlayersChange' on finished game - also make sure that leaving and rejoining the game works corectly
-  onPlayersChange(type, playerNum) {
-    if (this.phase != PHASE.initializing) {
-      if (this.players.some(p => p == null)) {
-        if (this.phase == remote_move) this.waitForPlayers()
-      } else if (this.phase == waiting_for_players) {
-        this.startNewTurn()
-      }
-      if (type == 'player_left') this.rematchRequestingPlayers.delete(playerNum)
-    }
+  aroundPlayersChange(type, playerNum, player, changePlayers) {
+    if (type == 'player_left') this.rematchRequestingPlayers.delete(playerNum)
+    changePlayers()
+    if (this.currentPlayer == null) this.waitForPlayers()
+    else if (this.phase == waiting_for_players) this.startNewTurn()
   }
 
   waitForPlayers() {
@@ -181,7 +177,9 @@ class BlackHoleGame {
 
       if (game.phase == waiting_for_players) {
         p.textSize(27)
-        p.text("Waiting for second player...", p.width / 2 - 155, p.height - 15)
+        const text = "Waiting for second player..."
+        const textWidth = p.drawingContext.measureText(text).width
+        p.text(text, p.width / 2 - textWidth / 2, p.height - 15)
       }
       else if (game.phase == PHASE.ended) {
         p.textSize(36)
