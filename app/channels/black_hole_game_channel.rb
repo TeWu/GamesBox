@@ -41,8 +41,7 @@ class BlackHoleGameChannel < GameSessionChannelBase
     if state.has_key? 'winner_name'
      state[:black_hole] = $redis.hgetall(redis_key(:black_hole))
                           .map {|k, v| [k, v.to_i] }.to_h
-     scores = $redis.hgetall(redis_key(:scores))
-     state[:scores] = ['0', '1'].map{|i| scores[i].to_i }
+     state[:scores] = $redis.lrange(redis_key(:scores), 0, 1).map(&:to_i)
      rematch = $redis.hkeys(redis_key(:rematch)).map(&:to_i)
      state[:rematch] = rematch unless rematch.empty?
     end
@@ -89,9 +88,7 @@ class BlackHoleGameChannel < GameSessionChannelBase
 
     $redis.hset(redis_key(:black_hole), :i, black_hole[:i])
     $redis.hset(redis_key(:black_hole), :j, black_hole[:j])
-    scores.each.with_index do |score, i|
-      $redis.hset(redis_key(:scores), i, score)
-    end
+    $redis.rpush(redis_key(:scores), scores)
     $redis.hset(redis_key, :winner_name, winnerName)
 
     broadcast(:end_game, {black_hole: black_hole, scores: scores, winner_name: winnerName})
@@ -117,7 +114,7 @@ class BlackHoleGameChannel < GameSessionChannelBase
     players_user_ids, scores, moves, starting_player = $redis.eval_script(:black_hole_snapshot, [redis_key])
 
     players_user_ids = players_user_ids.each_slice(2).to_a.sort.map {|x| x[1].to_i }
-    scores = scores.each_slice(2).to_a.sort.map {|x| x[1].to_i }
+    scores = scores.map(&:to_i)
     encoded_moves = encode_moves(
       moves.map do |move_str|
         convert_move_coordinate(*move_str.split(':').map(&:to_i))
