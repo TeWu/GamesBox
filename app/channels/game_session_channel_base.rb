@@ -3,11 +3,11 @@ class GameSessionChannelBase < ApplicationCable::Channel
 
   def subscribed
     self.session_id = params[:session_id]
-    self.channel_id = "game-ses:#{game_id}:#{session_id}"
+    self.channel_id = GamesBox::CONFIG[:channel_id_gen].call(game_id, session_id, public_session?)
 
     outcome, player_num, players = join_game_session
     if outcome != :session_full
-      initialize_state if players.compact.size == 1
+      initialize_session if players.compact.size == 1
       broadcast(:player_joined, {num: player_num, name: current_user_name}) if outcome == :joined
       stream_from channel_id
     else
@@ -20,7 +20,7 @@ class GameSessionChannelBase < ApplicationCable::Channel
     return if subscription_rejected?
     outcome, player_num, is_session_empty = leave_game_session
     broadcast(:player_left, player_num) if outcome == :left
-    tear_down_state if is_session_empty
+    tear_down_session if is_session_empty
     [outcome, player_num, is_session_empty]
   end
 
@@ -67,12 +67,26 @@ class GameSessionChannelBase < ApplicationCable::Channel
     state
   end
 
+  def public_session?
+    params[:is_public]
+  end
+
   def current_user_name
     current_user.display_name
   end
 
   def join_order
     [0, 1].shuffle
+  end
+
+  def initialize_session
+    $redis.sadd(public_sessions_key, session_id) if public_session?
+    initialize_state
+  end
+
+  def tear_down_session
+    $redis.srem(public_sessions_key, session_id) if public_session?
+    tear_down_state
   end
 
   def initialize_state
@@ -84,6 +98,10 @@ class GameSessionChannelBase < ApplicationCable::Channel
 
   def redis_key(*subkeys)
     [channel_id, *subkeys] * ':'
+  end
+
+  def public_sessions_key
+    @public_sessions_key ||= GamesBox::CONFIG[:public_sessions_key_gen].call(game_id)
   end
 
   def broadcast(type, payload = nil)

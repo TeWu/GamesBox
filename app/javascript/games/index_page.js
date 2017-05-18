@@ -4,11 +4,12 @@ const games = window.App.games
 
 class IndexPage extends Component {
 
+  componentWillMount() {
+    this.props.gameSessionsStore.fetchAll()
+  }
+
   render() {
-    return <div>
-      <h1>List of games</h1>
-      <GamesList games={Object.values(games)} />
-    </div>
+    return <GamesList games={Object.values(games)} store={this.props.gameSessionsStore} />
   }
 
 }

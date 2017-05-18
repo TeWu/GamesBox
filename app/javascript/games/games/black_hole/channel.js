@@ -6,7 +6,10 @@ const { waiting_for_move_confirmation } = PHASE
 class BlackHoleGameChannel extends GameSessionChannelBase {
 
   subscribe() {
-    return super.subscribe('BlackHoleGameChannel', { session_id: this.component.props.sessionId })
+    return super.subscribe('BlackHoleGameChannel', {
+      session_id: this.component.props.sessionId,
+      is_public: this.component.props.isPublic
+    })
   }
 
 

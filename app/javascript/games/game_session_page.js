@@ -15,7 +15,7 @@ class GameSessionPage extends Component {
     this.sessionId = props.match.params.sessionId
     this.gameComponent = React.createElement(
       GAME_COMPONENTS[this.gameInfo.urlSegment],
-      { gameInfo: this.gameInfo, sessionId: this.sessionId }
+      { gameInfo: this.gameInfo, sessionId: this.sessionId, isPublic: props.isPublic }
     )
   }
 

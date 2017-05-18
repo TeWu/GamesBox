@@ -31,7 +31,7 @@ class Ability < BaseAbility
 
   ### Subject groups ###
   def main_models
-    @main_models ||= [User]
+    @main_models ||= [User, :game_session]
   end
 
 end

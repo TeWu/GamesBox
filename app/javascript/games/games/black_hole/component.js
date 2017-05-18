@@ -34,7 +34,7 @@ class BlackHoleGameComponent extends Component {
 
     return (
       <div>
-        <h1>{this.props.gameInfo.name} game session {this.props.sessionId}</h1>
+        <h1>{this.props.gameInfo.name}</h1>
         <div class="game-board-header">
           <span class={classNames('red-player', { 'active': currPlayer == 0 && !gameOver })}>{players[0]}</span>
           <span class="players-divider">{icons}</span>
