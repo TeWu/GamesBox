@@ -1,0 +1,8 @@
+@import "font-awesome-sprockets";
+@import "font-awesome";
+
+@mixin icon($icon) {
+  @include fa-icon;
+  @extend .fa;
+  @extend .fa-#{$icon};
+}

@@ -49,6 +49,10 @@ class BlackHoleGameChannel < GameSessionChannelBase
     state
   end
 
+  def get_board_data
+    $redis.hgetall(redis_key(:board))
+  end
+
   def move(turn_num:, i:, j:)
     outcome = $redis.eval_script(:black_hole_move,
                                   [redis_key],
@@ -91,6 +95,7 @@ class BlackHoleGameChannel < GameSessionChannelBase
     $redis.hset(redis_key, :winner_name, winnerName)
 
     broadcast(:end_game, {black_hole: black_hole, scores: scores, winner_name: winnerName})
+    persist_game_session
   end
 
   def calculate_scores(consumed_circles)
@@ -102,14 +107,55 @@ class BlackHoleGameChannel < GameSessionChannelBase
                     end
   end
 
-  def get_board_data
-    $redis.hgetall(redis_key(:board))
-  end
-
   def reset_game
     $redis.eval_script(:game_reset, [redis_key])
     current_player = initialize_state
     broadcast(:reset, current_player)
+  end
+
+  def persist_game_session
+    players_user_ids, scores, moves, starting_player = $redis.eval_script(:black_hole_snapshot, [redis_key])
+
+    players_user_ids = players_user_ids.each_slice(2).to_a.sort.map {|x| x[1].to_i }
+    scores = scores.each_slice(2).to_a.sort.map {|x| x[1].to_i }
+    encoded_moves = encode_moves(
+      moves.map do |move_str|
+        convert_move_coordinate(*move_str.split(':').map(&:to_i))
+      end
+    )
+
+    session = BlackHoleGameSession.new(
+      series_id: session_id,
+      player0_id: players_user_ids[0],
+      player1_id: players_user_ids[1],
+      score0: scores[0],
+      score1: scores[1],
+      is_player0_starting: starting_player == '0',
+      moves: encoded_moves
+    )
+
+    session.save!
+    broadcast(:saved)
+  rescue
+    broadcast(:save_failed)
+  end
+
+  def convert_move_coordinate(i, j)
+    (i * (i + 1)) / 2 + j
+  end
+
+  def encode_moves(array)
+    array.map {|x| x.to_s(2).rjust(5, '0') }
+         .join.chars.each_slice(8).to_a
+         .map {|arr| arr.join.ljust(8,'0').to_i(2) }
+         .pack('C*')
+  end
+
+  def decode_moves(bytes)
+    bytes.unpack('C*')
+         .map {|x| x.to_s(2).rjust(8,'0') }
+         .join[0,100].chars.each_slice(5).to_a
+         .map {|x| x.join.to_i(2) }
   end
 
 end

@@ -48,3 +48,5 @@ gem 'cancancan', github: 'TeWu/cancancan', branch: 'develop' # For authorization
 gem 'stringex' # For pretty url id segments
 
 gem 'autoprefixer-rails' # Adds vendor prefixes to CSS rules, using the Asset Pipeline
+
+gem 'font-awesome-sass' # CSS icons toolkit

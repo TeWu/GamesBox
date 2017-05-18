@@ -1,8 +1,9 @@
 class GameSessionChannelBase < ApplicationCable::Channel
-  attr_accessor :channel_id
+  attr_accessor :channel_id, :session_id
 
   def subscribed
-    self.channel_id = "game-ses:#{game_id}:#{params[:session_id]}"
+    self.session_id = params[:session_id]
+    self.channel_id = "game-ses:#{game_id}:#{session_id}"
 
     outcome, player_num, players = join_game_session
     if outcome != :session_full
@@ -41,8 +42,8 @@ class GameSessionChannelBase < ApplicationCable::Channel
     order = join_order
     outcome, players = $redis.eval_script(:join_game_session,
                                            order,
-                                           [redis_key(:players), current_user_name,
-                                            redis_key(:players, :subs), current_user.id]
+                                           [redis_key(:players), redis_key(:players, 'user-ids'),
+                                            redis_key(:players, :subs), current_user_name, current_user.id]
                                          )
     player_num = outcome == 'session_full' ? nil : order[players.index(current_user_name)]
     [outcome.to_sym, player_num, players]
@@ -50,8 +51,9 @@ class GameSessionChannelBase < ApplicationCable::Channel
 
   def leave_game_session
     outcome, is_session_empty, *rest = $redis.eval_script(:leave_game_session,
-                                         [redis_key(:players), redis_key(:players, :subs), current_user.id],
-                                         [current_user_name]
+                                         [redis_key(:players), redis_key(:players, 'user-ids'),
+                                          redis_key(:players, :subs)],
+                                         [current_user_name, current_user.id]
                                        )
     player_num = outcome == 'left' ? rest.shift : nil
     [outcome.to_sym, player_num, !!is_session_empty, *rest]

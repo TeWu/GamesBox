@@ -60,8 +60,16 @@ class BlackHoleGameChannel extends GameSessionChannelBase {
           this.game.onRematchPending(payload)
         break
       case 'reset':
-        if (this.game.phase >= PHASE.ended)
+        if (this.game.phase >= PHASE.ended) {
           this.game.onGameReset(payload)
+          this.component.setState({ icons: {} })
+        }
+        break
+      case 'saved':
+        this.component.setState({ icons: { saved: true } })
+        break
+      case 'save_failed':
+        this.component.setState({ icons: { saveFailed: true } })
         break
     }
   }
