@@ -5,7 +5,7 @@ module ApplicationHelper
       this.App || (this.App = {});
       this.App.currentUser = {displayName: "#{current_user.try(:display_name)}"};
       this.App.sounds = {board_tap: "#{asset_url('board_tap.mp3')}"};
-    >.gsub(/\s/,'')
+    >
   end
 
 end
