@@ -1,0 +1,15 @@
+
+.game-sessions-list-container {
+  margin: 20px;
+}
+
+form.create-game-session {
+  margin: 5px;
+  padding: 10px;
+  background-color: #eee;
+
+  input {
+    &[type=checkbox] { margin-right: 5px; }
+    &[type=submit] { margin: 0 15px 0 3px; }
+  }
+}

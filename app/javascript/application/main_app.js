@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom'
-import * as RR from '../config/reverse_routes'
+import * as RR from 'config/reverse_routes'
 
 import UsersIndexPage from 'users/index_page'
 import ShowUserPage from 'users/show_page'
