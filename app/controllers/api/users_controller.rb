@@ -30,7 +30,25 @@ module Api
 
     private
     def user_params
-      params.require(:user).permit(:username, :password, :password_confirmation, :roles_bitmask, :display_name, :email, :invite_key)
+      params.require(:user).permit(:username, :password, :password_confirmation, :display_name, :email, :invite_key).merge(roles: authorized_roles_param)
     end
+
+    def authorized_roles_param
+      old_roles = (@user.present? && @user.persisted?) ? @user.roles : GamesBox::CONFIG[:new_user_roles_default]
+      new_roles = params.require(:user)[:roles]
+      raise(Exception, "Illegal roles param value") unless new_roles.nil? || new_roles.class == Array
+      if new_roles.nil? || new_roles == old_roles
+        old_roles
+      elsif can?(:assign_all_roles, @user || User)
+        new_roles
+      elsif can?(:assign_nongranting_roles, @user || User)
+        new_nongranting_roles = new_roles.select {|r| r.in? GamesBox::CONFIG[:nongranting_roles] }
+        old_granting_roles = old_roles.select {|r| r.in? GamesBox::CONFIG[:granting_roles] }
+        new_nongranting_roles + old_granting_roles
+      else
+        old_roles
+      end
+    end
+
   end
 end

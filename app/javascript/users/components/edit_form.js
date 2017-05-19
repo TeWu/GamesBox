@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import { observer } from 'mobx-react'
 import serialize from 'form-serialize'
-
 import User from 'users/model/user'
-import { TextField, PasswordField } from 'utils/form_fields'
+import { ensureArray } from 'utils/utils'
+import { TextField, PasswordField, CheckboxField } from 'utils/form_fields'
 
 
 @observer
@@ -19,6 +19,7 @@ class EditForm extends Component {
   handleSubmit(e) {
     e.preventDefault()
     const data = serialize(e.target, { hash: true })
+    ensureArray(data, 'roles')
     this.props.store.update(this.props.user.urlSegment, data)
       .then(user => alert("User updated successfully"))
       .catch(error => this.setState({ errors: error.response.data }))
@@ -28,7 +29,6 @@ class EditForm extends Component {
     const { user } = this.props
     if (!user) return <div>Loading...</div>
 
-    // TODO: Add field(s) for user's roles
     // TODO: Password confirmation not checked when blank
 
     const { errors } = this.state
@@ -41,6 +41,7 @@ class EditForm extends Component {
           <TextField label="Display name" name="display_name" defaultValue={user.displayName} errors={errors.display_name} />
           <TextField label="Email" name="email" defaultValue={user.email} errors={errors.email} />
           <TextField label="Invite key" name="invite_key" defaultValue={user.inviteKey} errors={errors.invite_key} />
+          <CheckboxField name="roles" values={['active', 'admin']} object={user} errors={errors.roles} />
         </section>
         <section class="form-actions">
           <input type="submit" value="Submit" />
