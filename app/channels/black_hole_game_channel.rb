@@ -73,10 +73,12 @@ class BlackHoleGameChannel < GameSessionChannelBase
     winnerNum = nil if scores[0] == scores[1]
     winnerName = winnerNum.nil? ? nil : $redis.hget(redis_key(:players), winnerNum)
 
-    $redis.hset(redis_key(:black_hole), :i, black_hole[:i])
-    $redis.hset(redis_key(:black_hole), :j, black_hole[:j])
-    $redis.rpush(redis_key(:scores), scores)
-    $redis.hset(redis_key, :winner_name, winnerName)
+    $redis.pipelined do
+      $redis.hset(redis_key(:black_hole), :i, black_hole[:i])
+      $redis.hset(redis_key(:black_hole), :j, black_hole[:j])
+      $redis.rpush(redis_key(:scores), scores)
+      $redis.hset(redis_key, :winner_name, winnerName)
+    end
 
     broadcast(:end_game, {black_hole: black_hole, scores: scores, winner_name: winnerName})
     persist_game_session
