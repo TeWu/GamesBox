@@ -29,8 +29,6 @@ class EditForm extends Component {
     const { user } = this.props
     if (!user) return <div>Loading...</div>
 
-    // TODO: Password confirmation not checked when blank
-
     const { errors } = this.state
     return (
       <form onSubmit={this.handleSubmit} >

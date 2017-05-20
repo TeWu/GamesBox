@@ -30,7 +30,14 @@ module Api
 
     private
     def user_params
-      params.require(:user).permit(:username, :password, :password_confirmation, :display_name, :email, :invite_key).merge(roles: authorized_roles_param)
+      params.require(:user)
+        .permit(:username, :password, :password_confirmation, :display_name, :email, :invite_key)
+        .merge(roles: authorized_roles_param)
+        .tap do |user_params|
+          if !user_params[:password].nil? && user_params[:password_confirmation].nil?
+            user_params[:password_confirmation] = ""
+          end
+        end
     end
 
     def authorized_roles_param
