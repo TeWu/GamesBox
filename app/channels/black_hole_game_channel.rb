@@ -121,7 +121,7 @@ class BlackHoleGameChannel < GameSessionChannelBase
       end
     )
 
-    session = BlackHoleGameSession.new(
+    session = BlackHoleArchivedGameSession.new(
       series_id: session_id,
       player0_id: players_user_ids[0],
       player1_id: players_user_ids[1],
