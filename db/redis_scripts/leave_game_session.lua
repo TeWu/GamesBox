@@ -5,7 +5,7 @@ if incr_res == 0 then
 
   local player_num = nil
   local get_res = redis.call('HGETALL', KEYS[1])
-  local get_res_len = table.getn(get_res)
+  local get_res_len = #get_res
   local i = 2
   while i <= get_res_len do
     if get_res[i] == ARGV[1] then
