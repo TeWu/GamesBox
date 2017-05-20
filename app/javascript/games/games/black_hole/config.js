@@ -15,3 +15,8 @@ export const PHASE = {
   ended: 6,
   rematch_requested: 7
 }
+
+export const TEXTS = {
+  waiting_for_players: 0,
+  winner_and_scores: 1
+}

@@ -27,8 +27,9 @@ class BlackHoleGameComponent extends Component {
   }
 
   render() {
-    const players = this.game.players.map(p => p ? p.name : "...")
+    const players = this.game.players.map(p => p ? p.name : "\u2026")
     const currPlayer = this.game.currentPlayerNum
+    const winner = this.game.winningPlayerName
     const gameOver = this.game.phase >= PHASE.ended
     const icons = Object.keys(this.state.icons).map(i => iconElems[i])
 
@@ -36,9 +37,9 @@ class BlackHoleGameComponent extends Component {
       <div>
         <h1>{this.props.gameInfo.name}</h1>
         <div class="game-board-header">
-          <span class={classNames('red-player', { 'active': currPlayer == 0 && !gameOver })}>{players[0]}</span>
+          <span class={classNames('red-player', { 'active': currPlayer == 0 && !gameOver, 'winner': winner == players[0] })}>{players[0]}</span>
           <span class="players-divider">{icons}</span>
-          <span class={classNames('blue-player', { 'active': currPlayer == 1 && !gameOver })} >{players[1]}</span>
+          <span class={classNames('blue-player', { 'active': currPlayer == 1 && !gameOver, 'winner': winner == players[1] })} >{players[1]}</span>
         </div>
         <P5 sketch={this.game.sketch} />
         <RematchControll game={this.game} />

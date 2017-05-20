@@ -19,7 +19,7 @@ class AuthController < ApplicationController
 
   def logout
     logout_current_user
-    redirect_to login_path, notice: "Logged out"
+    redirect_to login_path, status: :see_other, notice: "Logged out"
   end
 
   def register_page

@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom'
 import * as RR from 'config/reverse_routes'
 
+import NavBar from './navbar'
 import UsersIndexPage from 'users/index_page'
 import ShowUserPage from 'users/show_page'
 import EditUserPage from 'users/edit_page'
@@ -16,16 +17,21 @@ class MainApp extends Component {
   render() {
     return (
       <BrowserRouter>
-        <Switch>
-          <Route exact path={RR.users_path} component={p => <UsersIndexPage usersStore={usersStore} {...p} />} />
-          <Route exact path={RR.user_path({ urlSegment: ':user' })} component={p => <ShowUserPage usersStore={usersStore} {...p} />} />
-          <Route exact path={RR.edit_user_path({ urlSegment: ':user' })} component={p => <EditUserPage usersStore={usersStore} {...p} />} />
+        <section>
+          <NavBar />
+          <main>
+            <Switch>
+              <Route exact path={RR.users_path} component={p => <UsersIndexPage usersStore={usersStore} {...p} />} />
+              <Route exact path={RR.user_path({ urlSegment: ':user' })} component={p => <ShowUserPage usersStore={usersStore} {...p} />} />
+              <Route exact path={RR.edit_user_path({ urlSegment: ':user' })} component={p => <EditUserPage usersStore={usersStore} {...p} />} />
 
-          <Route exact path={RR.games_path} component={p => <GamesIndexPage gameSessionsStore={gameSessionsStore} {...p} />} />
-          <Route exact path={RR.game_path({ urlSegment: ':game' })} render={() => <Redirect to={RR.games_path} />} />
-          <Route exact path={RR.game_session_path({ urlSegment: ':game' }, ':sessionId')} component={p => <GameSessionPage isPublic={true} {...p} />} />} />
-          <Route exact path={RR.private_game_session_path({ urlSegment: ':game' }, ':sessionId')} component={p => <GameSessionPage isPublic={false} {...p} />} />} />
-        </Switch>
+              <Route exact path={RR.games_path} component={p => <GamesIndexPage gameSessionsStore={gameSessionsStore} {...p} />} />
+              <Route exact path={RR.game_path({ urlSegment: ':game' })} render={() => <Redirect to={RR.games_path} />} />
+              <Route exact path={RR.game_session_path({ urlSegment: ':game' }, ':sessionId')} component={p => <GameSessionPage isPublic={true} {...p} />} />} />
+              <Route exact path={RR.private_game_session_path({ urlSegment: ':game' }, ':sessionId')} component={p => <GameSessionPage isPublic={false} {...p} />} />} />
+            </Switch>
+          </main>
+        </section>
       </BrowserRouter>
     )
   }

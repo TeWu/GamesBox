@@ -2,7 +2,7 @@ import { observable } from 'mobx'
 import ObservableShallowSet from 'utils/mobx_observable_shallow_set'
 import BlackHoleGameChannel from './channel'
 import AudioManager from 'utils/audio_manager'
-import { BOARD_SIZE, CIRCLES_IN_RACK, CIRCLE_RADIUS, PLAYER_COLORS, PHASE } from './config'
+import { BOARD_SIZE, CIRCLES_IN_RACK, CIRCLE_RADIUS, PLAYER_COLORS, PHASE, TEXTS } from './config'
 import Rack from './game/rack'
 import Board from './game/board'
 const { waiting_for_players, local_move, remote_move, waiting_for_move_confirmation, waiting_for_scores, rematch_requested } = PHASE
@@ -19,6 +19,7 @@ class BlackHoleGame {
     this.channel = new BlackHoleGameChannel(component, this).subscribe()
     this.audioManager = new AudioManager
     this.sketch = this.sketch.bind(this, this)
+    this.drawHelper = new DrawHelper
 
     this.players = observable.shallowArray([null, null])
     this.isPlayerLocal = [null, null]
@@ -53,6 +54,7 @@ class BlackHoleGame {
     this.currentPlayerNum = startingPlayerNum
     this.scores = this.winningPlayerName = undefined
     this.rematchRequestingPlayers = new ObservableShallowSet
+    this.drawHelper.invalidate(this.drawHelper.winner_and_scores)
     this.startNewTurn()
   }
 
@@ -154,6 +156,7 @@ class BlackHoleGame {
 
 
   sketch(game, _, p) {
+    const h = game.drawHelper
 
     p.preload = function () {
       game.audioManager.load({
@@ -167,6 +170,19 @@ class BlackHoleGame {
       const boardSizeBase = CIRCLE_RADIUS * BOARD_SIZE + 1
       const canvas = p.createCanvas(3 * boardSizeBase, 2 * boardSizeBase)
       canvas.mouseClicked(mouseClicked)
+
+      h.p5 = p
+      h.registerTextGenerator(h.waiting_for_players, () => {
+        const text = "Waiting for second player..."
+        const textWidth = p.drawingContext.measureText(text).width
+        return { text: text, x: p.width / 2 - textWidth / 2, y: p.height - 15 }
+      })
+      h.registerTextGenerator(h.winner_and_scores, () => {
+        const resultText = game.winningPlayerName ? game.winningPlayerName + " wins!" : "Game drawn!"
+        const fullText = resultText + "  " + game.scores.join('/')
+        const fullTextWidth = p.drawingContext.measureText(fullText).width
+        return { text: fullText, x: p.width / 2 - fullTextWidth / 2, y: p.height - 10 }
+      })
     }
 
     p.draw = function () {
@@ -177,23 +193,12 @@ class BlackHoleGame {
 
       if (game.phase == waiting_for_players) {
         p.textSize(27)
-        const text = "Waiting for second player..."
-        const textWidth = p.drawingContext.measureText(text).width
-        p.text(text, p.width / 2 - textWidth / 2, p.height - 15)
+        h.drawText(h.waiting_for_players)
       }
-      else if (game.phase == PHASE.ended) {
+      else if (game.phase >= PHASE.ended) {
         p.textSize(36)
-        const resultText = game.winningPlayerName ? game.winningPlayerName + " wins!" : "Game drawn!"
-        const fullText = resultText + "  " + game.scores.join('/')
-        const fullTextWidth = p.drawingContext.measureText(fullText).width
-        p.text(fullText, p.width / 2 - fullTextWidth / 2, p.height - 10)
+        h.drawText(h.winner_and_scores)
       }
-
-      p.textSize(27)
-      p.text(`current player num: ${game.currentPlayerNum}`, 420, 30)
-      p.text(`phase: ${game.phase}`, 540, 55)
-      p.textSize(17)
-      p.text(`turn: ${game.turnNum}`, 580, 75)
     }
 
     const mouseClicked = function () {
@@ -207,6 +212,25 @@ class BlackHoleGame {
 
   }
 
+}
+
+class DrawHelper {
+  constructor() {
+    this.textDefs = {}
+    this.textDefGenerators = {}
+    Object.assign(this, TEXTS)
+  }
+
+  registerTextGenerator(textId, generator) {
+    this.textDefGenerators[textId] = generator
+  }
+
+  drawText(textId) {
+    const { text, x, y } = this.textDefs[textId] || (this.textDefs[textId] = this.textDefGenerators[textId]())
+    this.p5.text(text, x, y)
+  }
+
+  invalidate(textId) { this.textDefs[textId] = undefined }
 }
 
 export default BlackHoleGame

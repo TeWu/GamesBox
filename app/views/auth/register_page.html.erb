@@ -1,8 +1,11 @@
-<div><%= alert %><%= notice %></div>
+<div class="message-box">
+  <div class="alert"><%= alert %></div>
+  <div class="notice"><%= notice %></div>
+</div>
 
 <div id="login-box-container">
   <section id="logo" class="logo-big">
-    <h1>Register @ GamesBox</h1>
+    <h1>Register @ Games Box</h1>
   </section>
   <div id="login-box">
     <section id="content">
@@ -51,6 +54,7 @@
         </section>
         <section class="form-actions">
           <%= f.submit "Register", class: 'btn btn-default' %>
+          <div class="alt-action">or <%= link_to "Login", login_path %></div>
         </section>
       <% end %>
     </section>
