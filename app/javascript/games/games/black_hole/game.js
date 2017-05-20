@@ -66,8 +66,9 @@ class BlackHoleGame {
   aroundPlayersChange(type, playerNum, player, changePlayers) {
     if (type == 'player_left') this.rematchRequestingPlayers.delete(playerNum)
     changePlayers()
-    if (this.currentPlayer == null) this.waitForPlayers()
-    else if (this.phase == waiting_for_players) this.startNewTurn()
+    if (this.phase < PHASE.ended)
+      if (this.currentPlayer == null) this.waitForPlayers()
+      else if (this.phase == waiting_for_players) this.startNewTurn()
   }
 
   waitForPlayers() {
