@@ -1,4 +1,8 @@
 class SinglePageAppsController < ApplicationController
-  skip_authorization_check
   layout false
+
+  def main
+    authorize! :show, :app
+  end
+
 end

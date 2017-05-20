@@ -35,6 +35,7 @@ class AuthController < ApplicationController
                           .permit(:username, :password, :password_confirmation, :display_name, :email)
                           .merge(invited_by: inviter, roles: GamesBox::CONFIG[:new_user_roles_default])
       @user = User.new(user_params)
+      authorize! :create, @user
       if @user.save
         redirect_to login_path, flash: {username: @user.username, notice: "User registered successfully"}
       else

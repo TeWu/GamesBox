@@ -3,6 +3,7 @@ module Api
     GAMES_IDS = GamesBox::GAMES.keys
 
     def index
+      authorize! :index, :game
       authorize! :index, :game_session
       games_ids = params[:game_id] ? [params[:game_id]] : GAMES_IDS
       sessions = games_ids.map do |game_id|

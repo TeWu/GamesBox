@@ -6,11 +6,18 @@ class Ability < BaseAbility
 
   protected
 
+  def draw_guest
+    can :create, User, is_admin: false
+  end
+
   def logged_in user
-    can [:read, :update], main_models
   end
 
   def active user
+    can :show, :app
+    can :index, :game
+    can :read, :game_session
+    can [:read, :update], User, id: user.id
   end
 
   def admin(*)
@@ -31,7 +38,7 @@ class Ability < BaseAbility
 
   ### Subject groups ###
   def main_models
-    @main_models ||= [User, :game_session]
+    @main_models ||= [:app, User, :game, :game_session]
   end
 
 end

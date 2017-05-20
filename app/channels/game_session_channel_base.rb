@@ -2,6 +2,7 @@ class GameSessionChannelBase < ApplicationCable::Channel
   attr_accessor :channel_id, :session_id
 
   def subscribed
+    reject(reason: :forbidden) and return unless current_user.can? :show, :game_session
     self.session_id = params[:session_id]
     self.channel_id = GamesBox::CONFIG[:channel_id_gen].call(game_id, session_id, public_session?)
 
