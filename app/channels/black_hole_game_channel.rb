@@ -1,16 +1,3 @@
-
-# TODO: merge/synchronize with JS Black Hole config
-module GamesBox
-  module Games
-    module BlackHole
-      CONFIG = {
-        board_size: 6,
-        circles_in_rack: 10
-      }
-    end
-  end
-end
-
 BH = GamesBox::Games::BlackHole
 
 class BlackHoleGameChannel < GameSessionChannelBase

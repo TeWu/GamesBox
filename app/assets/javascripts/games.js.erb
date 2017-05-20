@@ -1,6 +1,13 @@
 <%
+camelize_keys = proc {|hash| hash.map{|k,v| [k.to_s.camelize(:lower), v] }.to_h }
+
+get_game_config = proc do |gameId|
+  game_name = GamesBox::GAMES[gameId][:name]
+  camelize_keys.call(GamesBox::Games.const_get(game_name.gsub(/\s/,''))::CONFIG)
+end
+
 games = GamesBox::GAMES.map do |k,v|
-  [k, v.map{|k,v| [k.camelize(:lower), v] }.to_h]
+  [ k, camelize_keys.call(v).merge(config: get_game_config.call(k)) ]
 end.to_h.to_json
 %>
 
