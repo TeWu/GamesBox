@@ -8,7 +8,7 @@ class GameSessionChannelBase < ApplicationCable::Channel
 
     outcome, player_num, players = join_game_session
     if outcome != :session_full
-      initialize_session if players.compact.size == 1
+      initialize_session if outcome == :joined && players.compact.size == 1
       broadcast(:player_joined, {num: player_num, name: current_user_name}) if outcome == :joined
       stream_from channel_id
     else
