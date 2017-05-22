@@ -4,7 +4,10 @@ module ApplicationHelper
     javascript_tag %Q<
       this.App || (this.App = {});
       this.App.currentUser = {displayName: "#{current_user.try(:display_name)}"};
-      this.App.sounds = {board_tap: "#{asset_url('board_tap.mp3')}"};
+      this.App.sounds = {
+        board_tap: "#{asset_url('board_tap.mp3')}",
+        board_tap_echo: "#{asset_url('board_tap_echo.mp3')}"
+      };
     >
   end
 

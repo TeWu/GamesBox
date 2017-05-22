@@ -2,7 +2,7 @@ import { observable } from 'mobx'
 import ObservableShallowSet from 'utils/mobx_observable_shallow_set'
 import BlackHoleGameChannel from './channel'
 import AudioManager from 'utils/audio_manager'
-import { BOARD_SIZE, CIRCLES_IN_RACK, CIRCLE_RADIUS, PLAYER_COLORS, PHASE, TEXTS } from './config'
+import { BOARD_SIZE, CIRCLES_IN_RACK, LAST_TURN_NUM, CIRCLE_RADIUS, PLAYER_COLORS, PHASE, TEXTS } from './config'
 import Rack from './game/rack'
 import Board from './game/board'
 const { waiting_for_players, local_move, remote_move, waiting_for_move_confirmation, waiting_for_scores, rematch_requested } = PHASE
@@ -109,7 +109,7 @@ class BlackHoleGame {
         boardCircle.empty()
       }
     }
-    this.audioManager.get('board_tap').start()
+    this.audioManager.get(this.turnNum < LAST_TURN_NUM ? 'board_tap' : 'board_tap_echo').start()
   }
 
   startNewTurn() {
@@ -161,7 +161,8 @@ class BlackHoleGame {
 
     p.preload = function () {
       game.audioManager.load({
-        board_tap: sounds.board_tap
+        board_tap: sounds.board_tap,
+        board_tap_echo: sounds.board_tap_echo
       })
     }
 

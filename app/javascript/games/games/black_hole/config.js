@@ -1,5 +1,6 @@
 export const BOARD_SIZE = window.App.games['black-hole'].config.boardSize
 export const CIRCLES_IN_RACK = window.App.games['black-hole'].config.circlesInRack
+export const LAST_TURN_NUM = CIRCLES_IN_RACK * 2 - 1
 export const CIRCLE_RADIUS = 40
 export const EMPTY_CIRCLE_COLOR = "#363636"
 export const BLACK_HOLE_CIRCLE_COLOR = "#000"
