@@ -1,5 +1,5 @@
 import GameSessionChannelBase from 'cable/game_session_channel_base'
-import { PHASE } from './config'
+import { LAST_TURN_NUM, PHASE } from './config'
 const { waiting_for_move_confirmation } = PHASE
 
 
@@ -36,17 +36,22 @@ class BlackHoleGameChannel extends GameSessionChannelBase {
 
     switch (type) {
       case 'move':
-        const i = payload.i, j = payload.j
-        if (this.game.phase == waiting_for_move_confirmation) {
-          if (this.game.lastMove.is(i, j))
-            this.game.onConfirmMove()
-          else {
-            this.game.onRejectMove()
-            this.game.onRemoteMove(i, j)
+        if (this.game.isInitialized()) {
+          const i = payload.i, j = payload.j
+          if (this.game.phase == waiting_for_move_confirmation) {
+            if (this.game.lastMove.is(i, j))
+              this.game.onConfirmMove()
+            else {
+              this.game.onRejectMove()
+              this.game.onRemoteMove(i, j)
+            }
+          }
+          else this.game.onRemoteMove(i, j)
+          if (this.game.turnNum > LAST_TURN_NUM && this.endGamePayload) {
+            this.game.endGame(this.endGamePayload.black_hole, this.endGamePayload.scores, this.endGamePayload.winner_name)
+            this.endGamePayload = undefined
           }
         }
-        else if (this.game.isInitialized())
-          this.game.onRemoteMove(i, j)
         break
       case 'move_rejected':
         if (this.game.phase == waiting_for_move_confirmation && payload.turn_num == this.game.turnNum) {
@@ -56,7 +61,8 @@ class BlackHoleGameChannel extends GameSessionChannelBase {
         break
       case 'end_game':
         if (this.game.isInitialized())
-          this.game.endGame(payload.black_hole, payload.scores, payload.winner_name)
+          if (this.game.turnNum > LAST_TURN_NUM) this.game.endGame(payload.black_hole, payload.scores, payload.winner_name)
+          else this.endGamePayload = payload
         break
       case 'rematch_pending':
         if (this.game.phase == PHASE.ended)
