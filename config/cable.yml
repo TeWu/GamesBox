@@ -6,5 +6,5 @@ test:
 
 production:
   adapter: redis
-  url: redis://localhost:6379/1
-  channel_prefix: gamesbox_production
+  url: <%= "redis://:#{ ENV['REDIS_PASSWORD'] }@#{ ENV['REDIS_HOST'] }:#{ ENV['REDIS_PORT'] }" %>
+  channel_prefix: cable

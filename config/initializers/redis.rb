@@ -1,5 +1,5 @@
 module GamesBox
-  configs = YAML.load( File.read File.join(Rails.root, 'config', 'redis.yml') )
+  configs = YAML.load( ERB.new(File.read(File.join(Rails.root, 'config', 'redis.yml'))).result )
   REDIS_CONFIG = configs['default'].merge(configs[Rails.env] || {}).with_indifferent_access.freeze
 
   # Instantiate Redis client (thread-safe)
