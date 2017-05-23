@@ -23,7 +23,7 @@ class EditPage extends Component {
     if (!user) return <div>Loading...</div>
 
     return (
-      <div>
+      <div class="page">
         <h1>{user.displayName}</h1>
         <EditForm store={this.props.usersStore} user={user} />
         <hr />

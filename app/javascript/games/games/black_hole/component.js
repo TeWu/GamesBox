@@ -4,7 +4,7 @@ import classNames from 'classnames'
 import paramCase from 'param-case'
 import P5 from 'utils/p5_component'
 import BlackHoleGame from './game'
-import RematchControll from './components/rematch_controll'
+import RematchControl from './components/rematch_control'
 import { PHASE } from './config'
 const games = window.App.games
 
@@ -34,7 +34,7 @@ class BlackHoleGameComponent extends Component {
     const icons = Object.keys(this.state.icons).map(i => iconElems[i])
 
     return (
-      <div>
+      <div class="black-hole-game-component">
         <h1>{this.props.gameInfo.name}</h1>
         <div class="game-board-header">
           <span class={classNames('red-player', { 'active': currPlayer == 0 && !gameOver, 'winner': winner == players[0] })}>{players[0]}</span>
@@ -42,7 +42,7 @@ class BlackHoleGameComponent extends Component {
           <span class={classNames('blue-player', { 'active': currPlayer == 1 && !gameOver, 'winner': winner == players[1] })} >{players[1]}</span>
         </div>
         <P5 sketch={this.game.sketch} />
-        <RematchControll game={this.game} />
+        <RematchControl game={this.game} />
       </div>
     )
   }

@@ -22,7 +22,7 @@ class ShowPage extends Component {
     const { username, displayName } = user
 
     return (
-      <div>
+      <div class="page">
         <h1>{displayName}</h1>
         <div><strong>username:</strong> {username}</div>
         <div><strong>created at:</strong> {user.createdAt}</div>

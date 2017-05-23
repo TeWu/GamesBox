@@ -1,58 +1,80 @@
 
-.game-board-header {
-  width: 723px;
+.black-hole-game-component {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  background-color: #bbb;
-  font-size: 32px;
+  flex: 1;
+  background-color: #d2d2d2;
 
-  .red-player {
-    flex: 1;
-    padding: 5px;
-    padding-left: 13px;
-    &.active { background: linear-gradient(to top, #a66 6px, #dbb 6px) }
-  }
+  .game-board-header {
+    width: 723px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #bbb;
+    font-size: 32px;
 
-  .blue-player {
-    flex: 1;
-    padding: 5px;
-    padding-right: 13px;
-    text-align: right;
-    &.active { background: linear-gradient(to top, #66a 6px, #bbd 6px) }
-  }
+    .red-player {
+      flex: 1;
+      padding: 5px;
+      padding-left: 13px;
+      &.active { background: linear-gradient(to top, #a66 6px, #dbb 6px) }
+    }
 
-  .winner {
-    background: linear-gradient(to top, #cece04 6px, #eaea9a 6px);
-    &:before {
-      margin-right: 9px;
-      color: #440;
-      @include icon(trophy);
+    .blue-player {
+      flex: 1;
+      padding: 5px;
+      padding-right: 13px;
+      text-align: right;
+      &.active { background: linear-gradient(to top, #66a 6px, #bbd 6px) }
+    }
+
+    .winner {
+      background: linear-gradient(to top, #cece04 6px, #eaea9a 6px);
+      &:before {
+        margin-right: 9px;
+        color: #440;
+        @include icon(trophy);
+      }
+    }
+
+    .players-divider {
+      height: 30px;
+      flex: 2;
+      font-size: 24px;
+      text-align: center;
+      line-height: 30px;
+
+      .saved-icon {
+        color: #888;
+        animation: fadein 0.6s;
+        @include icon(floppy-o);
+      }
+
+      .save-failed-icon {
+        color: #c33;
+        text-shadow: 1px 1px 1px #444;
+        animation: shake 1s, fadein 0.6s;
+        @include icon(exclamation-triangle);
+      }
     }
   }
 
-  .players-divider {
-    height: 30px;
-    flex: 2;
-    font-size: 24px;
-    text-align: center;
-    line-height: 30px;
+  .rematch-control {
+    margin-top: 3px;
 
-    .saved-icon {
-      color: #888;
-      animation: fadein 0.6s;
-      @include icon(floppy-o);
+    .rematch-request {
+      color: #303030;
+      font-size: 24px;
+      text-align: center;
     }
 
-    .save-failed-icon {
-      color: #c33;
-      text-shadow: 1px 1px 1px #444;
-      animation: shake 1s, fadein 0.6s;
-      @include icon(exclamation-triangle);
+    .rematch-button {
+      width: 723px;
+      height: 50px;
     }
   }
 }
-
 
 @keyframes fadein {
     from { opacity: 0; }

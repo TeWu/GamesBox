@@ -9,7 +9,9 @@ class IndexPage extends Component {
   }
 
   render() {
-    return <GamesList games={Object.values(games)} store={this.props.gameSessionsStore} history={this.props.history} />
+    return <div class="page">
+      <GamesList games={Object.values(games)} store={this.props.gameSessionsStore} history={this.props.history} />
+    </div>
   }
 
 }

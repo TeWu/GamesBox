@@ -1,4 +1,10 @@
 
+@mixin vertical-flex-fill() {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
 @mixin link-icon($icon) {
   @include icon($icon);
   margin-right: 4px;
@@ -24,6 +30,24 @@
   }
 }
 
+html { height: 100%; }
+
+body {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.react-component {
+  @include vertical-flex-fill;
+  & > section { @include vertical-flex-fill }
+}
+
 main {
+  @include vertical-flex-fill;
+}
+
+.page {
+  @include vertical-flex-fill;
   margin: 13px;
 }

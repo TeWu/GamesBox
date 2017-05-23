@@ -8,7 +8,9 @@ class IndexPage extends Component {
   }
 
   render() {
-    return <UsersList store={this.props.usersStore} />
+    return <div class="page">
+      <UsersList store={this.props.usersStore} />
+    </div>
   }
 
 }
