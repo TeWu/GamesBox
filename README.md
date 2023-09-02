@@ -1,6 +1,6 @@
 Games Box
 =======
-Deployed here: **https://gamesbox.herokuapp.com**
+~~Deployed here: **https://gamesbox.herokuapp.com**~~ (unfortunately had to be taken down)
 
 See also
 -------
